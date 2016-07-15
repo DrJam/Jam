@@ -17,6 +17,7 @@ playing|\<message\>|sets the playing status of the bot to a string
 permissions|me<br />set \<command\> \<target\> \<value\>|define permissions for a given command<br />see below for more detailed information
 
 ##Permissions
+###How do they work?
 For any command, there are three different types of permission that can apply, user, role, and server-wide, organised as such in JSON
 ```
 {

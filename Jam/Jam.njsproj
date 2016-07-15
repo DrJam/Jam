@@ -34,7 +34,6 @@
     <Compile Include="commands.js" />
     <Compile Include="params.js" />
     <Compile Include="permissions.js" />
-    <Content Include="auth.example.json" />
     <Content Include="auth.json" />
     <Content Include="data.json" />
     <Content Include="package.json" />

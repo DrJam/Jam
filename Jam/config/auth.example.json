@@ -1,7 +1,7 @@
 ﻿{
-	"email" : "dan@fordsville.co.uk",
+	"email" : "",
     "password": "",
-    "token": "MTk0MjA5MzM5MTc3ODI4MzUy.CkinCg.3TN19_hJgFx75o9A3vc4CJnZmlE",
-	  "youtube_api_key": "AIzaSyAow2gq4ApOhV421JgdsIlUBEob_2SUy6U",
-	  "wolfram_api_key": "HWGGA7-YHJ7KVVJJ8"
+    "token": "",
+	  "youtube_api_key": "",
+	  "wolfram_api_key": ""
 }

@@ -1,13 +1,13 @@
 ﻿{
-	"serverid": {
-		"ping": {
-			"all": false,
-			"role": {
-				"roleid": false
-			},
-			"user": {
-				"userid": false
-			}
-		}
-	}
+  "serverid": {
+    "ping": {
+      "all": false,
+      "role": {
+        "roleid": false
+      },
+      "user": {
+        "userid": false
+      }
+    }
+  }
 }

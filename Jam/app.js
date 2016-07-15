@@ -42,12 +42,16 @@ var client = new Discord.Client();
 
 var messageBox;
 
-client.on("ready", function () {
-    console.log("Ready. Serving " + client.channels.length + " channels.");
+client.on("ready",
+    function() {
+        console.log("Ready. Serving " + client.channels.length + " channels.");
 
-});
+    }
+);
 
-client.on("disconnected", function () {
-    console.log("Disconnected!");
-    process.exit(1);
-});
+client.on("disconnected",
+    function() {
+        console.log("Disconnected!");
+        process.exit(1);
+    }
+);

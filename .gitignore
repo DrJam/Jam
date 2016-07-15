@@ -243,3 +243,8 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+#private stuff
+Jam/config/auth.json
+Jam/config/permissions.json
+Jam/data/data.json

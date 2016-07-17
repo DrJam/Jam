@@ -32,6 +32,8 @@
   <ItemGroup>
     <Compile Include="app.js" />
     <Compile Include="commands.js" />
+    <Compile Include="fileHandler.js" />
+    <Compile Include="me.js" />
     <Compile Include="params.js" />
     <Compile Include="permissions.js" />
     <Content Include="config\auth.example.json" />
@@ -41,7 +43,6 @@
     <Content Include="data\data.json" />
     <Content Include="package.json" />
     <Content Include="config\permissions.json" />
-    <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />

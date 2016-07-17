@@ -1,10 +1,10 @@
 var param = {};
 
-var pRegex = /[\"|\'](.+?)[\"|\']|([^\s]+)/g;
+var pRegex = /(?:\"(.*?)\")|([\S]+)/g;
 
 param.getParams = function (suffix, usages) {
 	var paramsArray = getParamsArray(suffix);
-	return mapParams(paramsArray, usages);	
+    return mapParams(paramsArray, usages);
 };
 
 function getParamsArray (suffix) {
@@ -20,15 +20,18 @@ function getParamsArray (suffix) {
 }
 
 function mapParams (params, usages) {
-	var result = {};
+	var mapping = {};
 	for (var i = 0; i < usages.length; i++) {
 		if (usages[i].length != params.length) 
 			continue;
 
 		for (var j = 0; j < usages[i].length; j++) {
-			result[usages[i][j]] = params[j]; 
-		}
-		return result;
+			mapping[usages[i][j]] = params[j]; 
+        }
+        var result = {};
+        result.usageid = i;
+	    result.parameters = mapping;
+	    return result;
 	}
 	return null;
 }

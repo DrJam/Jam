@@ -1,3 +1,4 @@
+<img align="justified" src="taiga.jpg"/>
 # Jam<img align="right" src="avatar.jpg"/>
 
 A bot for Discord

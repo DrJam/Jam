@@ -1,54 +1,35 @@
-﻿try {
-    var Discord = require('discord.js');
-} catch (E) {
-    console.log(E.stack);
-    console.log("discord.js not found");
-    process.exit();
+﻿function loadModule(path)
+{
+    try {
+        return require(path);
+    }
+    catch (E) {
+        console.log("Following Error was encountered while loading `" + path + "`: " + E.message)
+        process.exit();
+    }
 }
 
-try {
-    var authDetails = require("./config/auth.json");
-} catch (E) {
-    console.log(E.stack);
-    console.log("/config/auth.json not found");
-    process.exit();
-}
-
-try {
-    var commands = require("./commands.js");
-} catch (E) {
-    console.log(E.stack);
-    console.log("commands.js not found");
-    process.exit();
-}
-
-try {
-    var params = require("./params.js");
-} catch (E) {
-    console.log(E.stack);
-    console.log("params.js not found");
-    process.exit();
-}
-
-try {
-    var FileHandler = require("./fileHandler.js");
-} catch (E) {
-    console.log(E.stack);
-    console.log("/datahandler.js not found");
-    process.exit();
-}
+var Discord = loadModule('discord.js');
+var authDetails = loadModule("./config/auth.json");
+var commands = loadModule("./commands.js");
+var params = loadModule("./params.js");
+var FileHandler = loadModule("./fileHandler.js");
+var gameModule = loadModule("./games.js");
 
 var client = new Discord.Client();
 var PREFIX = ",";
 
 global.startTime = Date.now();
 var meFileHandler = new FileHandler("./data/data.json");
+var gamesFileHandler =  new FileHandler("./data/games.json")
 
 client.on("ready",
     function() {
         console.log("Ready. Serving " + client.channels.length + " channels.");
         meFileHandler.load();
         meFileHandler.startSaveTimer();
+        gamesFileHandler.load();
+        gamesFileHandler.startSaveTimer();
     });
 
 client.on("disconnected",
@@ -98,8 +79,9 @@ client.on("message",
         }
         console.log(usage);
         command.process(client, message, usage, meFileHandler);
-    });
+});
 
+client.on("presence", function (oldUser, newUser) { gameModule.Update(oldUser,gamesFileHandler.data);});
 client.on("debug", (m) => console.log("[debug]", m));
 client.on("warn", (m) => console.log("[warn]", m));
 

@@ -95,7 +95,7 @@ var commands = {
             return;
         }
     },
-    "played": {
+    /*"played": {
         usages: [
             []
         ],
@@ -118,7 +118,7 @@ var commands = {
             }
             return;//Wondering why this is here - Harb.
         }
-        },
+        },*/
     "": {
         usages: [
             []

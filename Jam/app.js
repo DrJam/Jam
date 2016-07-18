@@ -82,7 +82,6 @@ client.on("message",
         command.process(client, message, usage, DATA);
 });
 
-client.on("presence", function (oldUser, newUser) { gameModule.Update(oldUser,gamesFileHandler.data);});
 client.on("debug", (m) => console.log("[debug]", m));
 client.on("warn", (m) => console.log("[warn]", m));
 

@@ -1,4 +1,4 @@
-<img href="https://tree.taiga.io/project/drjam-jam/kanban" align="justified" height="90" src="taiga.jpg"/>
+<a href="https://tree.taiga.io/project/drjam-jam/kanban"><img align="justified" height="90" src="taiga.jpg"/></a>
 # Jam<img align="right" src="avatar.jpg"/>
 
 A bot for Discord

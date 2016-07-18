@@ -1,6 +1,7 @@
 var param = {};
 
-var pRegex = /(?:\"(.*?)\")|([\S]+)/g;
+//https://regex101.com/r/zZ1dU0/1
+var pRegex = /"([^"]*?)"|'([^'s]*?)'|([\S]+)/g;
 
 param.getParams = function (suffix, usages) {
 	var paramsArray = getParamsArray(suffix);

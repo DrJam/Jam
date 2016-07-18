@@ -4,6 +4,7 @@ games.defaultTime = Date.now();
 
 games.Update = function(user,data)
 {
+    console.log("DEBUG: " + user.name + " updated their presence!");
     if (games.UserList[user.id] == undefined) { games.UserList[user.id] = games.defaultTime; }          //assert the time data exists.
     if (user.game != null) {
         if (data.games[user.game.name] == undefined) { data.games[user.game.name] = 0; }                //assert the game data exists.

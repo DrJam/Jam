@@ -84,8 +84,9 @@ var commands = {
             ["field", "value"]
         ],
         description: "",
-        process: function (client, message, usage, meFileHandler) {
+        process: function (client, message, usage, DATA) {
             console.log("me");
+            var meFileHandler = DATA["me"];
             if (usage == null) {
                 console.log("Incorrect usage");
                 return;
@@ -94,6 +95,30 @@ var commands = {
             return;
         }
     },
+    "played": {
+        usages: [
+            []
+        ],
+        description: "replies with which games the user has played for how long.",
+        process: function (client, message, usage, DATA) {
+            var data = DATA["games"].data["users"][message.author.id];
+            if (data == undefined || Object.keys(data).length == 0) {
+                client.sendMessage(message.channel,"I have not seen you play any games.")
+            } else {
+                var output = "I have seen you play the following game(s):```";
+                for (var key in data) {
+                    output += "\n" + key + " : ";
+                    if (data[key] < 1000 * 60 * 60)
+                        output += Math.round(data[key] / 1000 / 60) + " minutes.";
+                        else
+                         output += Math.round(data[key] / 1000 / 60 / 6) / 10 + " hours.";
+                }
+                output += "```";
+                client.sendMessage(message.channel, output);
+            }
+            return;//Wondering why this is here - Harb.
+        }
+        },
     "": {
         usages: [
             []

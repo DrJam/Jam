@@ -21,7 +21,8 @@ var PREFIX = ",";
 
 global.startTime = Date.now();
 var meFileHandler = new FileHandler("./data/data.json");
-var gamesFileHandler =  new FileHandler("./data/games.json")
+var gamesFileHandler = new FileHandler("./data/games.json");
+var DATA = { me: meFileHandler, games: gamesFileHandler };
 
 client.on("ready",
     function() {
@@ -78,7 +79,7 @@ client.on("message",
             return;
         }
         console.log(usage);
-        command.process(client, message, usage, meFileHandler);
+        command.process(client, message, usage, DATA);
 });
 
 client.on("presence", function (oldUser, newUser) { gameModule.Update(oldUser,gamesFileHandler.data);});

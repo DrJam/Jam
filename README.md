@@ -1,5 +1,5 @@
-<a href="https://tree.taiga.io/project/drjam-jam/kanban"><img align="justified" height="90" src="taiga.jpg"/></a>
-# Jam<img align="right" src="avatar.jpg"/>
+
+# Jam<img align="right" src="avatar.jpg"/><a href="https://tree.taiga.io/project/drjam-jam/kanban"><img align="right" height="90" src="taiga.jpg"/></a>
 
 A bot for Discord
 

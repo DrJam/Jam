@@ -14,8 +14,10 @@ function getParamsArray (suffix) {
 	while ((resultArray = pRegex.exec(suffix)) !== null) {
 		if (resultArray[1])
 			paramsArray.push(resultArray[1]);
-		else 
-			paramsArray.push(resultArray[2]);
+		else if(resultArray[2]) 
+            paramsArray.push(resultArray[2]);
+        else
+            paramsArray.push(resultArray[3]);
 	}
 	return paramsArray;
 }

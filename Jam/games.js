@@ -13,7 +13,7 @@ games.Update = function(user,data)
         data.users[user.id][user.game.name] = Date.now() - games.UserList[user.id];
         data.games[user.game.name] += Date.now() - games.UserList[user.id];
     }
-    games.UserList[user.id] = Date.Now();
+    games.UserList[user.id] = Date.now();
 }
 
 games.UserList = [];

@@ -42,7 +42,7 @@ fh.prototype.save = function() {
 
 fh.prototype.startSaveTimer = function() {
     this.save();
-    setTimeout(this.startSaveTimer, 1000 * 60 * 5);
+    setTimeout(this.startSaveTimer, 1000 * 60 * .5);
     return;
 }
 

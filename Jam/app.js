@@ -4,7 +4,7 @@
         return require(path);
     }
     catch (E) {
-        console.log("Following Error was encountered while loading `" + path + "`: " + E.message)
+        console.log("Following Error was encountered while loading `" + path + "`: " + E.message);
         process.exit();
     }
 }
@@ -28,9 +28,9 @@ client.on("ready",
     function() {
         console.log("Ready. Serving " + client.channels.length + " channels.");
         meFileHandler.load();
-        meFileHandler.startSaveTimer();
+//        meFileHandler.startSaveTimer();
         gamesFileHandler.load();
-        gamesFileHandler.startSaveTimer();
+//        gamesFileHandler.startSaveTimer();
     });
 
 client.on("disconnected",

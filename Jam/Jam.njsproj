@@ -42,6 +42,8 @@
     <Content Include="config\permissions.example.json" />
     <Content Include="data\data.example.json" />
     <Content Include="data\data.json" />
+    <Content Include="data\games.example.json" />
+    <Content Include="data\games.json" />
     <Content Include="package.json" />
     <Content Include="config\permissions.json" />
   </ItemGroup>

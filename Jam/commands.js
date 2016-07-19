@@ -6,10 +6,10 @@ var commands = {
             []
         ],
         description: "Replies with \"Pong!\", good for testing bot responsiveness.",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
             client.reply(message, "Pong!");
-        }
+        },
+        permissions: { global: true }
     },
     "servers": {
         usages: [
@@ -19,7 +19,8 @@ var commands = {
         process: function(client, message, usage)
         {
             client.sendMessage(message.channel, client.servers);
-        }
+        },
+        permissions: { global: true }
     },
     "myid": {
         usages: [
@@ -29,9 +30,10 @@ var commands = {
         process: function(client, message, usage)
         {
             client.sendMessage(message.channel, message.author.id);
-        }
+        },
+        permissions: { global: true }
     },
-    "idle": {
+    "idle": {//why do we even have this, or reserve this for developers.
         usages: [
             []
         ],
@@ -39,7 +41,8 @@ var commands = {
         process: function(client, message, usage)
         {
             client.setStatusIdle();
-        }
+        },
+        permissions: { global: false }
     },
     "online": {
         usages: [
@@ -49,7 +52,8 @@ var commands = {
         process: function(client, message, usage)
         {
             client.setStatusOnline();
-        }
+        },
+        permissions: { global: false }
     },
     "playing": {
         usages: [
@@ -64,7 +68,8 @@ var commands = {
                 client.setPlayingGame(null);
                 client.sendMessage(message.channel, "Playing status cleared");
             }
-        }
+        },
+        permissions: { global: false }
     },
     "permissions": {
         usages: [
@@ -75,7 +80,8 @@ var commands = {
         process: function(client, message, usage)
         {
 
-        }
+        },
+        permissions: { global: false }
     },
     "me": {
         usages: [
@@ -87,13 +93,10 @@ var commands = {
         process: function (client, message, usage, DATA) {
             console.log("me");
             var meFileHandler = DATA["me"];
-            if (usage == null) {
-                console.log("Incorrect usage");
-                return;
-            }
             client.sendMessage(message.channel, me.handle(message, usage, meFileHandler));
             return;
-        }
+        },
+        permissions: { global: true }
     },
     "played": {
         usages: [
@@ -117,8 +120,9 @@ var commands = {
                 client.sendMessage(message.channel, output);
             }
             return;//Wondering why this is here - Harb.
-        }
         },
+        permissions: { global: true }
+    }/*,
     "": {
         usages: [
             []
@@ -126,7 +130,7 @@ var commands = {
         description: "",
         process: function (client, message, usage) {
         }
-    }
+    }*/
 };
 
 module.exports = commands;

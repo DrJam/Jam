@@ -81,7 +81,7 @@ client.on("message",
         console.log(usage);
         command.process(client, message, usage, DATA);
 });
-
+client.on("presence", function (oldUser, newUser) { gameModule.Update(oldUser,DATA["games"].data);});
 client.on("debug", (m) => console.log("[debug]", m));
 client.on("warn", (m) => console.log("[warn]", m));
 

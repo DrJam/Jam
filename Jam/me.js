@@ -9,20 +9,18 @@ me.handle = function(message, usage, meFileHandler) {
         console.log("New user registered. ("+message.author.id+")");
     }
     if (usage.usageid == 0) {
-        console.log("get");
         return me.getMe(message.author, meFileHandler.data);
     }
     if (usage.usageid == 1) {
-        console.log("delete");
-        if (meFileHandler.data[message.author.id][usage.field] != undefined) {
-            delete meFileHandler.data[user][usage.parameters.field];
+        if (meFileHandler.data[message.author.id][usage.parameters.field] != undefined) {
+            delete meFileHandler.data[message.author.id][usage.parameters.field];
             return "Field \"" + usage.parameters.field + "\" deleted.";
         } else {
             return "No field  \"" + usage.parameters.field + "\" found.";
         }
     }
     if (usage.usageid == 2) {
-        console.log("edit"); var output;
+         var output;
         if (meFileHandler.data[message.author.id][usage.parameters.field] != undefined)
             output = "edited";
         else

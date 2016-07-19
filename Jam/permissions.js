@@ -6,8 +6,11 @@ try {
 }
 
 p.userHasPermission = function (user, server, command) {
-    var userRoles = server.getUserRoles(user);
+    if (user.id === server.owner.id)
+        return true;
 
+    var userRoles = server.getUserRoles(user);
+    
     if (!p.serverExists(server))
         return false;
 

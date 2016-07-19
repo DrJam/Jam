@@ -48,7 +48,7 @@ client.on("disconnected",
 client.on("message",
     function(message) {
         var content = message.content;
-        var command;
+        var command; var commandcopy;
         var suffix;
 
         if (message.author == client.user) {
@@ -75,20 +75,33 @@ client.on("message",
 
         console.log();
         console.log(message.server.name + " | " + message.author.name + "#" + message.author.discriminator + ":" + message.content);
-
+    
+        commandcopy = command;
         command = commands[command];
 
         var usage = params.getParams(suffix, command.usages);
         if (!usage) {
             console.log("Incorrect usage");
-            client.sendMessage(message.channel, "Incorrect usage, help under development.");
+            var output = "Incorrect usage. Below is a list of supported usage(s).```";
+            for (var a = 0; a < command.usages.length; a++) {
+                output += "\n" + PREFIX + commandcopy;
+                for (var b = 0; b < command.usages[a].length; b++) {
+                    output += " <" + command.usages[a][b] + ">";
+                }
+            }
+            output += "```";
+            client.sendMessage(message.channel, output);
             return;
         }
         console.log(usage);
         command.process(client, message, usage, DATA);
-});
+    });
+
 client.on("presence", function (oldUser, newUser) { gameModule.Update(oldUser,DATA["games"].data);});
-client.on("debug", (m) => console.log("[debug]", m));
+client.on("debug", (m)=> console.log("[debug]", m));
 client.on("warn", (m) => console.log("[warn]", m));
+
+client.on("serverCreated",(m) => console.log("Joined a new server!"));//create permissions and data.
+client.on("serverDeleted",(m) => console.log("Left a server!"));//delete permissions and data?
 
 client.loginWithToken(authDetails.token);

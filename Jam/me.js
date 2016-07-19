@@ -2,10 +2,11 @@
 
 me.handle = function(message, usage, meFileHandler) {
     if (!meFileHandler.dataLoaded) {
-        return "Data not loaded";
+        return "Data not loaded.";
     }
     if (!me.userInData(message.author, meFileHandler)) {
-        return "User not in data";
+        meFileHandler.data[message.author.id] = {};
+        console.log("New user registered. ("+message.author.id+")");
     }
     if (usage.usageid == 0) {
         console.log("get");
@@ -13,21 +14,37 @@ me.handle = function(message, usage, meFileHandler) {
     }
     if (usage.usageid == 1) {
         console.log("delete");
-
-        return "Field " + usage.field + " deleted";
+        if (meFileHandler.data[message.author.id][usage.field] != undefined) {
+            delete meFileHandler.data[user][usage.parameters.field];
+            return "Field \"" + usage.parameters.field + "\" deleted.";
+        } else {
+            return "No field  \"" + usage.parameters.field + "\" found.";
+        }
+    }
+    if (usage.usageid == 2) {
+        console.log("edit"); var output;
+        if (meFileHandler.data[message.author.id][usage.parameters.field] != undefined)
+            output = "edited";
+        else
+            output = "created";
+        meFileHandler.data[message.author.id][usage.parameters.field] = usage.parameters.value;
+        return "Field \""+usage.parameters.field+"\" "+output+"."
     }
     return "Unknown error";
 };
 
-me.userInData = function() {
-    
+me.userInData = function(user,filehandler) {
+    data = filehandler.data;
+    if (data[user.id] != undefined)
+        return true;
+    return false;
 }
 
 me.getMe = function(author, data) {
     var output = "__**" + author.name + "**__\n";
-    if (!data.hasOwnProperty(author.id)) {
+    if (!data.hasOwnProperty(author.id) || Object.keys(data[author.id]).length == 0) {
         console.log("No data saved for this user");
-        output += "No data saved for this user";
+        output += "No data saved for this user.";
         return output;
     }
     for (var key in data[author.id]) {

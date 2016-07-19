@@ -24,14 +24,20 @@ var meFileHandler = new FileHandler("./data/data.json");
 var gamesFileHandler = new FileHandler("./data/games.json");
 var DATA = { me: meFileHandler, games: gamesFileHandler };
 
+
+function saveIntervalElapsed(){
+    for (var key in DATA) {
+        DATA[key].save();
+    }
+}
+
 client.on("ready",
     function() {
         console.log("Ready. Serving " + client.channels.length + " channels.");
         meFileHandler.load();
-//        meFileHandler.startSaveTimer();
         gamesFileHandler.load();
-//        gamesFileHandler.startSaveTimer();
-    });
+        setInterval(saveIntervalElapsed, 1000 * 60 * 5);
+});
 
 client.on("disconnected",
     function() {

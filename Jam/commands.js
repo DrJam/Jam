@@ -111,10 +111,21 @@ var commands = {
                 var output = "I have seen you play the following game(s):```";
                 for (var key in data) {
                     output += "\n" + key + " : ";
-                    if (data[key] < 1000 * 60 * 60)
-                        output += Math.round(data[key] / 1000 / 60) + " minutes.";
-                        else
-                         output += Math.round(data[key] / 1000 / 60 / 6) / 10 + " hours.";
+                    var msec = data[key]
+                    var days = Math.floor(msec / 1000 / 60 / 60 / 24);
+                    msec -= days * 1000 * 60 * 60 * 24;
+                    var hours = Math.floor(msec / 1000 / 60 / 60);
+                    msec -= hours * 1000 * 60 * 60;
+                    var mins = Math.floor(msec / 1000 / 60);
+                    if (days > 0) {
+                        output += days + " days ";
+                    }
+                    if (hours > 0) {
+                        output += hours + " hours ";
+                    }
+                    if (mins > 0) {
+                        output += mins + " minutes ";
+                    }
                 }
                 output += "```";
                 client.sendMessage(message.channel, output);

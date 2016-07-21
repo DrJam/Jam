@@ -112,7 +112,7 @@ var commands = {
                     }
                 }
                 if (copy.length != 0) {
-                    copy.sort(function (x, y) { return x.time - y.time; });
+                    copy.sort(function (x, y) { return y.time - x.time; });
                     for (var a = 0; a < copy.length && a < 10; a++) {
                         output += "\n" + copy[a].name + " :";
                         var msec = copy[a].time;

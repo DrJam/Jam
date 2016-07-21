@@ -5,7 +5,7 @@
     }
     catch (E) {
         console.log("Following Error was encountered while loading `" + path + "`: " + E.message);
-        process.exit();
+        //process.exit();
     }
 }
 
@@ -23,7 +23,8 @@ global.startTime = Date.now();
 var meFileHandler = new FileHandler("./data/data.json");
 var gamesFileHandler = new FileHandler("./data/games.json");
 var DATA = { me: meFileHandler, games: gamesFileHandler };
-
+meFileHandler.load();
+gamesFileHandler.load();
 
 function saveIntervalElapsed(){
     for (var key in DATA) {
@@ -34,8 +35,7 @@ function saveIntervalElapsed(){
 client.on("ready",
     function() {
         console.log("Ready. Serving " + client.channels.length + " channels.");
-        meFileHandler.load();
-        gamesFileHandler.load();
+
         setInterval(saveIntervalElapsed, 1000 * 60 * 5);
 });
 

@@ -16,8 +16,7 @@ var commands = {
             []
         ],
         description: "Lists the servers the bot is connected to.",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
             client.sendMessage(message.channel, client.servers);
         },
         permissions: { global: true }
@@ -27,19 +26,18 @@ var commands = {
             []
         ],
         description: "Shows the User ID of the sender",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
             client.sendMessage(message.channel, message.author.id);
         },
         permissions: { global: true }
     },
-    "idle": {//why do we even have this, or reserve this for developers.
+    "idle": {
+//why do we even have this, or reserve this for developers.
         usages: [
             []
         ],
         description: "Sets the bot's status to Idle",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
             client.setStatusIdle();
         },
         permissions: { global: false }
@@ -49,8 +47,7 @@ var commands = {
             []
         ],
         description: "Sets the bot's status to Online",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
             client.setStatusOnline();
         },
         permissions: { global: false }
@@ -77,8 +74,7 @@ var commands = {
             ["action", "command", "target", "value"]
         ],
         description: "",
-        process: function(client, message, usage)
-        {
+        process: function (client, message, usage) {
 
         },
         permissions: { global: false }
@@ -106,28 +102,40 @@ var commands = {
         process: function (client, message, usage, DATA) {
             var data = DATA["games"].data["users"][message.author.id];
             if (data == undefined || Object.keys(data).length == 0) {
-                client.sendMessage(message.channel,"I have not seen you play any games.")
+                client.sendMessage(message.channel, "I have not seen you play any games.")
             } else {
                 var output = "I have seen you play the following game(s):```";
+                var copy = [];
                 for (var key in data) {
-                    output += "\n" + key + " : ";
-                    var msec = data[key]
-                    var days = Math.floor(msec / 1000 / 60 / 60 / 24);
-                    msec -= days * 1000 * 60 * 60 * 24;
-                    var hours = Math.floor(msec / 1000 / 60 / 60);
-                    msec -= hours * 1000 * 60 * 60;
-                    var mins = Math.floor(msec / 1000 / 60);
-                    if (days > 0) {
-                        output += days + " days ";
-                    }
-                    if (hours > 0) {
-                        output += hours + " hours ";
-                    }
-                    if (mins > 0) {
-                        output += mins + " minutes ";
+                    if (data[key] > 60000) {
+                        copy.push({ name: key, time: data[key] })
                     }
                 }
-                output += "```";
+                if (copy.length != 0) {
+                    copy.sort(function (x, y) { return x.time - y.time; });
+                    for (var a = 0; a < copy.length && a < 10; a++) {
+                        output += "\n" + copy[a].name + " :";
+                        var msec = copy[a].time;
+                        var days = Math.floor(msec / 1000 / 60 / 60 / 24);
+                        msec -= days * 1000 * 60 * 60 * 24;
+                        var hours = Math.floor(msec / 1000 / 60 / 60);
+                        msec -= hours * 1000 * 60 * 60;
+                        var mins = Math.floor(msec / 1000 / 60);
+                        if (days > 0) {
+                            output += " " + days + " days";
+                        }
+                        if (hours > 0) {
+                            output += " " + hours + " hours";
+                        }
+                        if (mins > 0) {
+                            output += " " + mins + " minutes";
+                        }
+                        output += "."
+                    }
+                    output += "```";
+                } else {
+                    output = "I have not seen you play any games long enough to be relevant.";
+                }
                 client.sendMessage(message.channel, output);
             }
             return;//Wondering why this is here - Harb.

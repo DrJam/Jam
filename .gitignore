@@ -245,8 +245,10 @@ ModelManifest.xml
 .fake/
 
 #private stuff
-Jam/config/auth.json
-Jam/config/config.json
-Jam/config/permissions.json
-Jam/data/data.json
-Jam/data/games.json
+config/auth.json
+config/config.json
+data/data.json
+data/games.json
+data/permissions.default.json
+data/permissions.global.json
+data/permissions.json

@@ -7,6 +7,6 @@
     "name": "Daniel"
   },
   "dependencies": {
-    "discord.js": "^8.0.0"
+    "discord.js": "hydrabolt/discord.js#indev"
   }
 }

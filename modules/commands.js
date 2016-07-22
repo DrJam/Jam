@@ -30,18 +30,7 @@ var commands = {
             client.sendMessage(message.channel, message.author.id);
         },
         permissions: { global: true }
-    },
-    "idle": {
-//why do we even have this, or reserve this for developers.
-        usages: [
-            []
-        ],
-        description: "Sets the bot's status to Idle",
-        process: function (client, message, usage) {
-            client.setStatusIdle();
-        },
-        permissions: { global: false }
-    },
+    },/*
     "online": {
         usages: [
             []
@@ -78,7 +67,7 @@ var commands = {
 
         },
         permissions: { global: false }
-    },
+    },*/
     "me": {
         usages: [
             [],
@@ -86,13 +75,21 @@ var commands = {
             ["field", "value"]
         ],
         description: "",
-        process: function (client, message, usage, DATA) {
-            console.log("me");
-            var meFileHandler = DATA["me"];
-            client.sendMessage(message.channel, me.handle(message, usage, meFileHandler));
+        process: function (client, message, usage, dataHandlers) {
+            client.sendMessage(message.channel, me.handle(message, usage, dataHandlers.me));
             return;
         },
         permissions: { global: true }
+    },
+    "lookup": {
+        usages: [
+            ["name"]
+        ],
+        description: "",
+        process: function (client, message, usage, dataHandlers) {
+            client.sendMessage(message.channel, me.lookup(message, usage, dataHandlers.me));
+            return;
+        }
     },
     "played": {
         usages: [

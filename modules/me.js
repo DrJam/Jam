@@ -1,33 +1,62 @@
-﻿var me = {};
+﻿function resolveName(server, name) {
+    var results = []
+    
+    for (var sUser of server.members) {
+        if(sUser) {
+            if (sUser.name == name || server.detailsOfUser(sUser).nick == name) {
+                results.push(sUser);
+            }
+        }
+    }
 
-me.handle = function(message, usage, meFileHandler) {
-    if (!meFileHandler.dataLoaded) {
+    return results;
+}
+
+var me = {};
+
+me.lookup = function(message, usage, fileHandler) {
+    if (!fileHandler.dataLoaded)
         return "Data not loaded.";
+    var users = resolveName(message.server, usage.parameters.name);
+    var output = "";
+    for (var i = 0; i < users.length; i++) {
+        output += me.getMe(users[i], fileHandler.data) + "\n";
     }
-    if (!me.userInData(message.author, meFileHandler)) {
-        meFileHandler.data[message.author.id] = {};
-        console.log("New user registered. ("+message.author.id+")");
+    return output;
+};
+
+me.handle = function(message, usage, fileHandler) {
+    if (!fileHandler.dataLoaded)
+        return "Data not loaded.";
+
+    if (!me.userInData(message.author, fileHandler)) {
+        fileHandler.data[message.author.id] = {};
+        console.log("New user registered. (" + message.author.id + ")");
     }
+
     if (usage.usageid == 0) {
-        return me.getMe(message.author, meFileHandler.data);
+        return me.getMe(message.author, fileHandler.data);
     }
+
     if (usage.usageid == 1) {
-        if (meFileHandler.data[message.author.id][usage.parameters.field] != undefined) {
-            delete meFileHandler.data[message.author.id][usage.parameters.field];
+        if (fileHandler.data[message.author.id][usage.parameters.field] != undefined) {
+            delete fileHandler.data[message.author.id][usage.parameters.field];
             return "Field \"" + usage.parameters.field + "\" deleted.";
         } else {
             return "No field  \"" + usage.parameters.field + "\" found.";
         }
     }
+
     if (usage.usageid == 2) {
          var output;
-        if (meFileHandler.data[message.author.id][usage.parameters.field] != undefined)
+        if (fileHandler.data[message.author.id][usage.parameters.field] != undefined)
             output = "edited";
         else
             output = "created";
-        meFileHandler.data[message.author.id][usage.parameters.field] = usage.parameters.value;
+        fileHandler.data[message.author.id][usage.parameters.field] = usage.parameters.value;
         return "Field \""+usage.parameters.field+"\" "+output+"."
     }
+
     return "Unknown error";
 };
 
@@ -36,22 +65,22 @@ me.userInData = function(user,filehandler) {
     if (data[user.id] != undefined)
         return true;
     return false;
-}
+};
 
-me.getMe = function(author, data) {
-    var output = "__**" + author.name + "**__\n";
-    if (!data.hasOwnProperty(author.id) || Object.keys(data[author.id]).length == 0) {
+me.getMe = function(user, data) {
+    var output = "__**" + user.name + "**#" + user.discriminator + "__\n";
+    if (!data.hasOwnProperty(user.id) || Object.keys(data[user.id]).length == 0) {
         console.log("No data saved for this user");
         output += "No data saved for this user.";
         return output;
     }
-    for (var key in data[author.id]) {
-        if (data[author.id].hasOwnProperty(key)) {
-            output += "**" + key + "**: " + me.removeLinkPreviews(data[author.id][key]) + "\n";
+    for (var key in data[user.id]) {
+        if (data[user.id].hasOwnProperty(key)) {
+            output += "**" + key + "**: " + me.removeLinkPreviews(data[user.id][key]) + "\n";
         }
     }
     return output;
-}
+};
 
 me.formatOutput = function(data) {
     var result = "";
@@ -61,7 +90,7 @@ me.formatOutput = function(data) {
         }
     }
     return result;
-}
+};
 
 me.removeLinkPreviews = function(str) {
     var reg = /(https?:\/\/[^\s]+)/g;
@@ -81,6 +110,6 @@ me.removeLinkPreviews = function(str) {
         }
     }
     return str;
-}
+};
 
 module.exports = me;

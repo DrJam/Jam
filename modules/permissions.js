@@ -61,8 +61,4 @@ p.roleDefinedForCommand = function(server, command, role) {
 		: false;
 }
 
-p.addPermission = function(params) {
-	if params.hasOwnProperty()
-}
-
 module.exports = p;

@@ -138,6 +138,34 @@ var commands = {
             return;//Wondering why this is here - Harb.
         },
         permissions: { global: true }
+    },
+    "donate": {
+        usages: [
+            []
+        ],
+        description: "gives donate link",
+        process: function (client, message, usage) {
+            client.sendMessage(message.channel, "Donate towards bot upkeep here: <https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4XCZN4NU3A94L>")
+        }
+    },
+    "help": {
+        usages: [
+            []
+        ],
+        description: "gives help",
+        process: function (client, message, usage) {
+            client.sendMessage(message.channel, "No help right now, sorry, try @ing Dan (not between 9:00 and 18:00 Mon - Fri) or Harb");
+        }
+    },
+    "jam": {
+        usages: [
+            []
+        ],
+        description: "",
+        process: function (client, message, usage) {
+            client.sendMessage(message.channel, "GitHub: <https://github.com/DrJam/Jam>" + "\n"
+                + "Development Portal: <https://tree.taiga.io/project/drjam-jam/kanban>");
+        }
     }/*,
     "": {
         usages: [

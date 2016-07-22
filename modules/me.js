@@ -23,7 +23,7 @@ me.lookup = function(message, usage, fileHandler) {
     }
     var output = "";
     for (var i = 0; i < users.length; i++) {
-        output += me.getMe(users[i], fileHandler.data) + "\n";
+        output += me.getMe(users[i], fileHandler.data) + ((i < users.length - 1) ? "\n" : "");
     }
     return output;
 };

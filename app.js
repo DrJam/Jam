@@ -64,7 +64,8 @@ client.on("message", function(message) {
         return;
 
     console.log();
-    console.log(message.server.name + " | " + message.author.name + "#" + message.author.discriminator + ":" + message.content);
+    console.log(message.server.name + " | #" + message.channel.name + " | " 
+        + message.author.name + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
 

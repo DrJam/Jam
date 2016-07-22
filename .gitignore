@@ -246,6 +246,7 @@ ModelManifest.xml
 
 #private stuff
 Jam/config/auth.json
+Jam/config/config.json
 Jam/config/permissions.json
 Jam/data/data.json
 Jam/data/games.json

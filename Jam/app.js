@@ -19,7 +19,7 @@ var gameModule = loadModule("./games.js");
 var client = new Discord.Client();
 var PREFIX = ",";
 
-global.startTime = Date.now();
+var startTime = Date.now();
 var meFileHandler = new FileHandler("./data/data.json");
 var gamesFileHandler = new FileHandler("./data/games.json");
 var DATA = { me: meFileHandler, games: gamesFileHandler };

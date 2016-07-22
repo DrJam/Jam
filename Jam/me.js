@@ -66,7 +66,7 @@ me.formatOutput = function(data) {
 me.removeLinkPreviews = function(str) {
     var reg = /(https?:\/\/[^\s]+)/g;
     var match;
-    while (match = reg.exec(str)) {
+    while ((match = reg.exec(str))) {
         if (match.index == 0) {
             str = "<" + match[1] + ">" + str.substr(match[1].length);
             continue;

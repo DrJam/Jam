@@ -1,0 +1,12 @@
+﻿{
+    "ping": {
+        "all": true,
+        "role": { },
+        "user": { }
+    }/*,
+    "": {
+        "all": true,
+        "role": { },
+        "user": { }
+    }*/
+}

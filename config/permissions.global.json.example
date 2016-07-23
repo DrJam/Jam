@@ -1,0 +1,10 @@
+{
+    "ping": {
+        "enabled": true,
+        "public": true
+    }/*,
+    "": {
+        "enabled": true,
+        "public": true
+    }*/
+}

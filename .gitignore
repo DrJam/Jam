@@ -247,8 +247,8 @@ ModelManifest.xml
 #private stuff
 config/auth.json
 config/config.json
+config/permissions.default.json
+config/permissions.global.json
 data/data.json
 data/games.json
-data/permissions.default.json
-data/permissions.global.json
 data/permissions.json

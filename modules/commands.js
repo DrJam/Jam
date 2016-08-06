@@ -31,16 +31,6 @@ var commands = {
         },
         permissions: { global: true }
     },/*
-    "online": {
-        usages: [
-            []
-        ],
-        description: "Sets the bot's status to Online",
-        process: function (client, message, usage) {
-            client.setStatusOnline();
-        },
-        permissions: { global: false }
-    },
     "playing": {
         usages: [
             ["status"]
@@ -54,17 +44,6 @@ var commands = {
                 client.setPlayingGame(null);
                 client.sendMessage(message.channel, "Playing status cleared");
             }
-        },
-        permissions: { global: false }
-    },
-    "permissions": {
-        usages: [
-            ["action"],
-            ["action", "command", "target", "value"]
-        ],
-        description: "",
-        process: function (client, message, usage) {
-
         },
         permissions: { global: false }
     },*/

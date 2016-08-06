@@ -21,6 +21,7 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
+var emoji = loadModule("./modules/emoji.js");
 
 var auth = loadModule("./config/auth.json");
 var config = loadModule("./config/config.json");
@@ -51,6 +52,10 @@ client.on("disconnected", function() {
 client.on("message", function(message) {
     if (message.author == client.user)
         return;
+
+    if (emoji.check(client, message, config)) {
+        return;
+    }
 
     if (!message.content.startsWith(config.prefix))
         return;
@@ -85,6 +90,18 @@ client.on("message", function(message) {
     }
     console.log(usage);
     commandObj.process(client, message, usage, dataHandlers);
+});
+
+client.on("serverNewMember", function (server, user) {
+    try {
+        var role = server.roles.get("name", "Dota");
+        var user = server.members.get("id", user.id);
+    } catch (e) {
+        console.log(e);
+    }
+    client.addMemberToRole(user, role);
+    var logsChannel = server.channels.get("name", "logs");    
+    client.sendMessage(logsChannel, user.name + " joined the server, gave role Dota");
 });
 
 client.on("presence", function (oldUser, newUser) {

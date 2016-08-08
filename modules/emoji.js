@@ -6,8 +6,8 @@ e.check = function (client, message, config) {
         if (result[1] == null)
             continue;
         for (var e of config.emoji) {
-            if (e == result[1]) {
-                client.sendFile(message.channel, "emoji/" + result[1] + ".png");
+            if (e.toLowerCase() == result[1].toLowerCase()) {
+                client.sendFile(message.channel, "emoji/" + e + ".png");
                 return true;
             }
         }

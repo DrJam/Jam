@@ -36,7 +36,7 @@ moduleName.eventsHandled = {
 };
 
 moduleName.events = {
-    "ready": function (mod, ) {},
+    "ready": function (mod) {},
     "debug": function (mod, message) {},
     "message": function (mod, message) {},
     "warn": function (mod, message) {},

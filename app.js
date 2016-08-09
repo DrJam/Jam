@@ -53,7 +53,7 @@ client.on("message", function(message) {
     if (message.author == client.user)
         return;
 
-    if (emoji.check(client, message, config)) {
+    if (emoji.check(emoji, client, message, config)) {
         return;
     }
 

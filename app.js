@@ -77,7 +77,7 @@ client.on("message", function(message) {
     var usage = params.getParams(suffix, commandObj.usages);
     if (!usage) {
         console.log("Incorrect usage");
-        var output = "Incorrect usage. Below is a list of supported usage(s).```";
+        var output = "Incorrect usage. Below is a list of supported usage(s) or try \""+prefix+"help "+prefix+"\".```";
         for (var uIndex = 0; uIndex < commandObj.usages.length; uIndex++) {
             output += "\n" + config.prefix + prefix;
             for (var pIndex = 0; pIndex < commandObj.usages[uIndex].length; pIndex++) {

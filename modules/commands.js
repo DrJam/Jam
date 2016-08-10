@@ -53,7 +53,10 @@ var commands = {
             ["field"],
             ["field", "value"]
         ],
-        description: "",
+        description: "__This command has 3 modes:__\n"+
+            ":small_blue_diamond: **With no arguments**: Replies with information you set up before.\n"+
+            ":small_blue_diamond: **With one argument**: Deletes a field in your information.\n"+
+            ":small_blue_diamond: **With two arguments**: Adds or edits a field in your information. You can add spaces in the arguments by enclosing them with \"\". For example `.me Roles \"Mid > Carry > Pudge > rest\"`",
         process: function (client, message, usage, dataHandlers) {
             client.sendMessage(message.channel, me.handle(message, usage, dataHandlers.me));
             return;
@@ -64,7 +67,7 @@ var commands = {
         usages: [
             ["name"]
         ],
-        description: "",
+        description: "Finds the specified user's info.",
         process: function (client, message, usage, dataHandlers) {
             client.sendMessage(message.channel, me.lookup(message, usage, dataHandlers.me));
             return;
@@ -74,7 +77,7 @@ var commands = {
         usages: [
             []
         ],
-        description: "replies with which games the user has played for how long.",
+        description: "Replies with which games the user has played for how long.",
         process: function (client, message, usage, DATA) {
             var data = DATA["games"].data["users"][message.author.id];
             if (data == undefined || Object.keys(data).length == 0) {
@@ -114,7 +117,6 @@ var commands = {
                 }
                 client.sendMessage(message.channel, output);
             }
-            return;//Wondering why this is here - Harb.
         },
         permissions: { global: true }
     },
@@ -122,25 +124,50 @@ var commands = {
         usages: [
             []
         ],
-        description: "gives donate link",
+        description: "gives a donation link, all profits go to the hosting of me.",
         process: function (client, message, usage) {
             client.sendMessage(message.channel, "Donate towards bot upkeep here: <https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4XCZN4NU3A94L>")
         }
     },
     "help": {
         usages: [
-            []
+            [],
+            ["command"]
         ],
-        description: "gives help",
+        description: "This command provides help of a specified command. If the target command is omitted, it just gives some info",
         process: function (client, message, usage) {
-            client.sendMessage(message.channel, "No help right now, sorry, try @ing Dan (not between 9:00 and 18:00 Mon - Fri) or Harb");
+            var output = "";
+            if(usage.usageid == 0){
+                output = "**Type \".help\" followed by a space and another of my commands to get help about it!**\n I have the following commands available:";
+                for(var i in commands)
+                {
+                    output+="\n:small_blue_diamond: ."+i;
+                }
+            }
+            if(usage.usageid == 1){
+                var target = usage.parameters["command"];
+                if(target.startsWith("."))//remove prefix if supplied
+                    target =  target.substr(1);
+                if(commands[target] != undefined){
+                    try{
+                        output = commands[target].description;
+                    }
+                    catch(E){
+                        output = "@Harb or Dan fucked up.";
+                    }
+                }else{
+                output = "I don't have help (yet) on that command."
+                }
+                
+            }
+            client.sendMessage(message.channel, output);
         }
     },
     "jam": {
         usages: [
             []
         ],
-        description: "",
+        description: "Gives some information about the bot.",
         process: function (client, message, usage) {
             client.sendMessage(message.channel, "GitHub: <https://github.com/DrJam/Jam>" + "\n"
                 + "Development Portal: <https://tree.taiga.io/project/drjam-jam/kanban>");

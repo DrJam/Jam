@@ -75,7 +75,7 @@ client.on("message", function(message) {
     commandObj = commands[prefix];
 
     var usage = params.getParams(suffix, commandObj.usages);
-    if (!usage) {
+    if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
         console.log("Incorrect usage");
         var output = "Incorrect usage. Below is a list of supported usage(s) or try \""+config.prefix+"help "+prefix+"\".```";
         for (var uIndex = 0; uIndex < commandObj.usages.length; uIndex++) {
@@ -88,8 +88,7 @@ client.on("message", function(message) {
         client.sendMessage(message.channel, output);
         return;
     }
-    console.log(usage);
-    commandObj.process(client, message, usage, dataHandlers);
+    
 });
 
 client.on("serverNewMember", function (server, user) {

@@ -8,6 +8,7 @@ var commands = {
         description: "Replies with \"Pong!\", good for testing bot responsiveness.",
         process: function (client, message, usage) {
             client.reply(message, "Pong!");
+            return true;
         },
         permissions: { global: true }
     },
@@ -18,6 +19,7 @@ var commands = {
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
             client.sendMessage(message.channel, client.servers);
+            return true;
         },
         permissions: { global: true }
     },
@@ -28,6 +30,7 @@ var commands = {
         description: "Shows the User ID of the sender",
         process: function (client, message, usage) {
             client.sendMessage(message.channel, message.author.id);
+            return true;
         },
         permissions: { global: true }
     },/*
@@ -59,7 +62,7 @@ var commands = {
             ":small_blue_diamond: **With two arguments**: Adds or edits a field in your information. You can add spaces in the arguments by enclosing them with \"\". For example `.me Roles \"Mid > Carry > Pudge > rest\"`",
         process: function (client, message, usage, dataHandlers) {
             client.sendMessage(message.channel, me.handle(message, usage, dataHandlers.me));
-            return;
+            return true;
         },
         permissions: { global: true }
     },
@@ -70,8 +73,9 @@ var commands = {
         description: "Finds the specified user's info.",
         process: function (client, message, usage, dataHandlers) {
             client.sendMessage(message.channel, me.lookup(message, usage, dataHandlers.me));
-            return;
-        }
+            return true;
+        },
+        permissions: { global: true }
     },
     "played": {
         usages: [
@@ -116,6 +120,7 @@ var commands = {
                     output = "I have not seen you play any games long enough to be relevant.";
                 }
                 client.sendMessage(message.channel, output);
+                return true;
             }
         },
         permissions: { global: true }
@@ -127,7 +132,9 @@ var commands = {
         description: "gives a donation link, all profits go to the hosting of me.",
         process: function (client, message, usage) {
             client.sendMessage(message.channel, "Donate towards bot upkeep here: <https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4XCZN4NU3A94L>")
-        }
+            return true;
+        },
+        permissions: { global: true }
     },
     "help": {
         usages: [
@@ -161,7 +168,9 @@ var commands = {
                 
             }
             client.sendMessage(message.channel, output);
-        }
+            return true;
+        },
+        permissions: { global: true }
     },
     "jam": {
         usages: [
@@ -171,7 +180,28 @@ var commands = {
         process: function (client, message, usage) {
             client.sendMessage(message.channel, "GitHub: <https://github.com/DrJam/Jam>" + "\n"
                 + "Development Portal: <https://tree.taiga.io/project/drjam-jam/kanban>");
-        }
+                return true;
+        },
+        permissions: { global: true }
+    },
+    "avatar": {
+        usages: [
+            ["mention"]
+        ],
+        description: "Gives the url of the avatar of the mentioned user.",
+        process: function (client, message, usage) {
+            if(message.mentions.length>0){
+                if(message.mentions[0].avatarURL!=null){
+                    client.sendMessage(message.channel,message.mentions[0].avatarURL);
+                }else{
+                    client.sendMessage(message.channel,"That user has no avatar set yet.");
+                }
+                return true;
+            }else{
+                return false;
+            }
+        },
+        permissions: { global: true }
     }/*,
     "": {
         usages: [
@@ -179,8 +209,10 @@ var commands = {
         ],
         description: "",
         process: function (client, message, usage) {
-        }
-    }*/
+        },
+        permissions: { global: true }
+    }
+    */
 };
 
 module.exports = commands;

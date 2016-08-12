@@ -1,7 +1,18 @@
 ﻿function loadModule(path)
 {
     try {
-        return require(path);
+        var mod = require(path);
+        if(mod.events != undefined && mod.events != null)
+        {
+            var counter  = 0;
+            for(var i in mod.events){
+                if(events[i]== undefined){events[i] = [];}
+                events[i].push([mod,mod.events[i]]);
+                counter++;
+            }
+            console.log(`Registered ${counter} event(s) for ${path}`);
+        }
+        return mod;
     }
     catch (E) {
         console.log("Following Error was encountered while loading `" + path + "`: " + E.message);
@@ -14,6 +25,8 @@ function saveIntervalElapsed(){
         dataHandlers[key].save();
     }
 }
+
+var events = {};
 
 var Discord = loadModule('discord.js');
 var FileHandler = loadModule("./modules/fileHandler.js");
@@ -41,21 +54,33 @@ var client = new Discord.Client(clientConfig);
 
 client.on("ready", function() {
     console.log("Ready. Serving " + client.channels.length + " channels.");
-
     setInterval(saveIntervalElapsed, 1000 * 60 * config.saveInterval);
+
+    for(var i in events["ready"])
+    {
+        events["ready"][i][1](events["ready"][i][0],client);
+    }
 });
 
 client.on("disconnected", function() {
     console.log("Disconnected!");
+        for(var i in events["disconnected"])
+    {
+        events["disconnected"][i][1](events["disconnected"][i][0],client);
+    }
 });
 
 client.on("message", function(message) {
+    for(var i in events["message"])
+    {
+        events["message"][i][1](events["message"][i][0],client,message);
+    }
     if (message.author == client.user)
         return;
-
+    /*
     if (emoji.check(emoji, client, message, config)) {
         return;
-    }
+    }*/ //deprecated with new module handling.
 
     if (!message.content.startsWith(config.prefix))
         return;
@@ -92,6 +117,10 @@ client.on("message", function(message) {
 });
 
 client.on("serverNewMember", function (server, user) {
+    for(var i in events["serverNewMember"])
+    {
+        events["serverNewMember"][i][1](events["serverNewMember"][i][0],client,server,user);
+    }
     try {
         var role = server.roles.get("name", "Dota");
         var user = server.members.get("id", user.id);
@@ -104,19 +133,157 @@ client.on("serverNewMember", function (server, user) {
 });
 
 client.on("presence", function (oldUser, newUser) {
+    for(var i in events["presence"])
+    {
+        events["presence"][i][1](events["presence"][i][0],client,oldUser,newUser);
+    }
     game.Update(oldUser,dataHandlers["games"].data);
 });
 
-client.on("debug", (m)=> console.log("[debug]", m));
-client.on("warn", (m) => console.log("[warn]", m));
-client.on("error", (m) => console.log("[error]", m));
+//start boring code
+client.on("debug", function(message){
+    for(var i in events["debug"])
+    {
+        events["debug"][i][1](events["debug"][i][0],client,message);
+    }
+    console.log(`[debug] ${message}`);
+});
+client.on("warn", function(message){
+    for(var i in events["warn"])
+    {
+        events["warn"][i][1](events["warn"][i][0],client,message);
+    }
+    console.log(`[warn] ${message}`);
+});
+client.on("error", function(message){
+    for(var i in events["error"])
+    {
+        events["error"][i][1](events["error"][i][0],client,message);
+    }
+    console.log(`[error] ${message}`);
+});
 
 client.on("serverCreated", function(server) {
-    console.log("Joined server: " + server.name);
+    for(var i in events["serverCreated"])
+    {
+        events["serverCreated"][i][1](events["serverCreated"][i][0],client,server);
+    }
+    console.log(`[serverCreated] ${server.name}`);;
 });
 
 client.on("serverDeleted", function(server) {
-    console.log("Left server: " + server.name);
+    for(var i in events["warn"])
+    {
+        events["warn"][i][1](events["warn"][i][0],client,server);
+    }
+    console.log(`[warn] ${server.name}`);
 });
+
+client.on("messageDeleted",function (message, channel) {
+    for(var i in events["messageDeleted"])
+    {
+        events["messageDeleted"][i][1](events["messageDeleted"][i][0],client,message,channel);
+    }
+});
+
+client.on("messageUpdated", function (oldMessage, newMessage) {
+    for(var i in events["messageUpdated"])
+    {
+        events["messageUpdated"][i][1](events["messageUpdated"][i][0],client,oldMessage,newMessage);
+    }
+});
+
+client.on("serverUpdated", function (oldServer, newServer) {
+    for(var i in events["serverUpdated"])
+    {
+        events["serverUpdated"][i][1](events["serverUpdated"][i][0],client,oldServer,newServer);
+    }
+});
+
+client.on("channelCreated",function(channel){
+    for(var i in events["channelCreated"])
+    {
+        events["channelCreated"][i][1](events["channelCreated"][i][0],client,channel)
+    }
+});
+
+client.on("channelDeleted",function(channel){
+    for(var i in events["channelDeleted"])
+    {
+        events["channelDeleted"][i][1](events["channelDeleted"][i][0],client,channel)
+    }
+});
+
+client.on("channelUpdated",function(oldChannel,newChannel){
+    for(var i in events["channelUpdated"])
+    {
+        events["channelUpdated"][i][1](events["channelUpdated"][i][0],client,oldChannel,newChannel)
+    }
+});
+
+client.on("serverRoleCreated",function(role){
+    for(var i in events["serverRoleCreated"])
+    {
+        events["serverRoleCreated"][i][1](events["serverRoleCreated"][i][0],client,role)
+    }
+});
+
+client.on("serverRoleDeleted",function(role){
+    for(var i in events["serverRoleDeleted"])
+    {
+        events["serverRoleDeleted"][i][1](events["serverRoleDeleted"][i][0],client,role)
+    }
+});
+
+client.on("serverRoleUpdated",function(oldRole,newRole){
+    for(var i in events["serverRoleUpdated"])
+    {
+        events["serverRoleUpdated"][i][1](events["serverRoleUpdated"][i][0],client,oldRole,newRole)
+    }
+});
+
+client.on("serverMemberRemoved",function(server,user){
+    for(var i in events["serverMemberRemoved"])
+    {
+        events["serverMemberRemoved"][i][1](events["serverMemberRemoved"][i][0],client,server,user)
+    }
+});
+
+client.on("serverMemberUpdated",function(server,oldUser,newUser){
+    for(var i in events["serverMemberUpdated"])
+    {
+        events["serverMemberUpdated"][i][1](events["serverMemberUpdated"][i][0],client,server,oldUser,newUser)
+    }
+});
+
+client.on("userTypingStarted",function(server,user,channel){
+    for(var i in events["userTypingStarted"])
+    {
+        events["userTypingStarted"][i][1](events["userTypingStarted"][i][0],client,user,channel)
+    }
+});
+
+client.on("userTypingStopped",function(server,user,channel){
+    for(var i in events["userTypingStopped"])
+    {
+        events["userTypingStopped"][i][1](events["userTypingStopped"][i][0],client,user,channel)
+    }
+});
+
+client.on("userBanned",function(user,server){
+    for(var i in events["userBanned"])
+    {
+        events["userBanned"][i][1](events["userBanned"][i][0],client,user,server)
+    }
+});
+client.on("userUnbanned",function(user,server){
+    for(var i in events["userUnbanned"])
+    {
+        events["userUnbanned"][i][1](events["userUnbanned"][i][0],client,user,server)
+    }
+});
+//I left the following events undefined : notUpdated, voicejoin, voiceswitch, voiceleave, voicestateupdate, voicespeaking. I don't foresee a use for them any time soon.'
+
+//end boring code
 
 client.loginWithToken(auth.token);

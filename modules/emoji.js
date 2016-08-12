@@ -11,7 +11,6 @@ var result;
 
 mod.emoji = [];
 
-
 mod.updateEmoji = function (mod) {
     mod.emoji = [];
     var files = fs.readdirSync("emoji/");//code stolen from http://resolvethis.com/how-to-get-all-files-in-a-folder-in-javascript/
@@ -26,7 +25,7 @@ mod.updateEmoji = function (mod) {
 
 mod.updateEmoji(mod);
 
-mod.check = function (mod, client, message, config) {
+mod.check = function (mod, client, message) {
     while (( result = regex.exec(message.content)) != null) {
         if (result[1] == null)
             continue;
@@ -40,14 +39,10 @@ mod.check = function (mod, client, message, config) {
     return false;
 }
 
+mod.events = {
+    "message": mod.check 
+    };
 
 module.exports = mod;
-/*
-mod.eventsHandled = {
-     "message": true
-    };
 
-mod.events = {
-    "message": module.check 
-    };
-*/
+

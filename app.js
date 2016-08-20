@@ -82,6 +82,11 @@ client.on("message", function(message) {
         return;
     }*/ //deprecated with new module handling.
 
+    if (message.content === "ayy") {
+        client.sendMessage(message.channel, "lmao");
+        return;
+    }
+
     if (!message.content.startsWith(config.prefix))
         return;
 

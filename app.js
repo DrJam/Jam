@@ -16,7 +16,7 @@
     }
     catch (E) {
         console.log("Following Error was encountered while loading `" + path + "`: " + E.message);
-        //process.exit();
+        process.exit();
     }
 }
 
@@ -35,19 +35,28 @@ var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
 var emoji = loadModule("./modules/emoji.js");
+var roleManager =  loadModule("./modules/rolemanager.js");
+var permissions = loadModule("./modules/permissions.js");
 
 var auth = loadModule("./config/auth.json");
 var config = loadModule("./config/config.json");
 config.startTime = Date.now();
 
+permissions.commands = commands;
+permissions.config = config; //neater solution needed
+
 var dataHandlers = { 
     me: new FileHandler("./data/data.json"), 
-    games: new FileHandler("./data/games.json") 
+    games: new FileHandler("./data/games.json"),
+    roles: new FileHandler("./data/roles.json"),
+    permissions : new FileHandler("./data/permissions.json") 
 };
-
 for (var key in dataHandlers) {
     dataHandlers[key].load();
 }
+
+permissions.data = dataHandlers.permissions.data;
+roleManager.data = dataHandlers.roles.data;
 
 var clientConfig = { autoReconnect: true };
 var client = new Discord.Client(clientConfig);
@@ -55,7 +64,10 @@ var client = new Discord.Client(clientConfig);
 client.on("ready", function() {
     console.log("Ready. Serving " + client.channels.length + " channels.");
     setInterval(saveIntervalElapsed, 1000 * 60 * config.saveInterval);
-
+    if(config.status != undefined)
+        client.setPlayingGame(config.status);
+    else
+        client.setPlayingGame("config.status is undefined!");
     for(var i in events["ready"])
     {
         events["ready"][i][1](events["ready"][i][0],client);
@@ -71,6 +83,8 @@ client.on("disconnected", function() {
 });
 
 client.on("message", function(message) {
+    if(message.server == undefined)//we do not handle private messages!
+        return;
     for(var i in events["message"])
     {
         events["message"][i][1](events["message"][i][0],client,message);
@@ -103,22 +117,24 @@ client.on("message", function(message) {
         + message.author.name + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
-
-    var usage = params.getParams(suffix, commandObj.usages);
-    if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
-        console.log("Incorrect usage");
-        var output = "Incorrect usage. Below is a list of supported usage(s) or try \""+config.prefix+"help "+prefix+"\".```";
-        for (var uIndex = 0; uIndex < commandObj.usages.length; uIndex++) {
-            output += "\n" + config.prefix + prefix;
-            for (var pIndex = 0; pIndex < commandObj.usages[uIndex].length; pIndex++) {
-                output += " <" + commandObj.usages[uIndex][pIndex] + ">";
+    if(permissions.hasPermissions(permissions, message.server, message.author,commandObj)){
+        var usage = params.getParams(suffix, commandObj.usages);
+        if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
+            console.log("Incorrect usage");
+            var output = "Incorrect usage. Below is a list of supported usage(s) or try \""+config.prefix+"help "+prefix+"\".```";
+            for (var uIndex = 0; uIndex < commandObj.usages.length; uIndex++) {
+                output += "\n" + config.prefix + prefix;
+                for (var pIndex = 0; pIndex < commandObj.usages[uIndex].length; pIndex++) {
+                    output += " <" + commandObj.usages[uIndex][pIndex] + ">";
+                }
             }
+            output += "```";
+            client.sendMessage(message.channel, output);
+            return;
         }
-        output += "```";
-        client.sendMessage(message.channel, output);
-        return;
+    }else{//no permissions.
+        client.sendMessage(message.channel, "sorry, ur not cool enough for that command");
     }
-    
 });
 
 client.on("serverNewMember", function (server, user) {

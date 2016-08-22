@@ -1,7 +1,9 @@
 ﻿var me = require("./me.js");
+var roleManager = require("./iam.js")
 
 var commands = {
     "ping": {
+		name: "ping",
         usages: [
             []
         ],
@@ -13,28 +15,31 @@ var commands = {
         permissions: { global: true }
     },
     "servers": {
+		name: "servers",
         usages: [
             []
         ],
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
-            client.sendMessage(message.channel, client.servers);
+            client.sendMessage(message.channel, "These are the servers I'm connected to:\n"+client.servers);
             return true;
         },
-        permissions: { global: true }
+        permissions: { global: true, restricted: true }
     },
     "myid": {
+		name: "myid",
         usages: [
             []
         ],
         description: "Shows the User ID of the sender",
         process: function (client, message, usage) {
-            client.sendMessage(message.channel, message.author.id);
+            client.sendMessage(message.channel, `This is your id: **${message.author.id}**`);
             return true;
         },
-        permissions: { global: true }
-    },/*
+        permissions: { global: true, restricted : true }
+    },
     "playing": {
+		name: "playing",
         usages: [
             ["status"]
         ],
@@ -47,10 +52,12 @@ var commands = {
                 client.setPlayingGame(null);
                 client.sendMessage(message.channel, "Playing status cleared");
             }
+            return true;
         },
-        permissions: { global: false }
-    },*/
+        permissions: { global: false, restricted : true }
+    },
     "me": {
+		name: "me",
         usages: [
             [],
             ["field"],
@@ -67,6 +74,7 @@ var commands = {
         permissions: { global: true }
     },
     "lookup": {
+		name: "lookup",
         usages: [
             ["name"]
         ],
@@ -78,6 +86,7 @@ var commands = {
         permissions: { global: true }
     },
     "played": {
+		name: "played",
         usages: [
             []
         ],
@@ -104,15 +113,22 @@ var commands = {
                         var hours = Math.floor(msec / 1000 / 60 / 60);
                         msec -= hours * 1000 * 60 * 60;
                         var mins = Math.floor(msec / 1000 / 60);
-                        if (days > 0) {
+                        if (days > 1) 
                             output += " " + days + " days";
-                        }
-                        if (hours > 0) {
+                        if(days == 1)
+                            output += " 1 day";
+                        if(minutes==0 && days>0)
+                            output += " and"
+                        if (hours > 1)
                             output += " " + hours + " hours";
-                        }
-                        if (mins > 0) {
+                        if(hours == 1)
+                            output += " 1 hour";
+                        if(days+hours > 0)
+                            output += " and"
+                        if (mins > 1)
                             output += " " + mins + " minutes";
-                        }
+                        if(mins == 1)
+                            output += " 1 minute";
                         output += "."
                     }
                     output += "```";
@@ -125,7 +141,10 @@ var commands = {
         },
         permissions: { global: true }
     },
+
+
     "donate": {
+		name: "donate",
         usages: [
             []
         ],
@@ -137,6 +156,7 @@ var commands = {
         permissions: { global: true }
     },
     "help": {
+		name: "help",
         usages: [
             [],
             ["command"]
@@ -173,6 +193,7 @@ var commands = {
         permissions: { global: true }
     },
     "jam": {
+		name: "jam",
         usages: [
             []
         ],
@@ -185,6 +206,7 @@ var commands = {
         permissions: { global: true }
     },
     "avatar": {
+		name: "avatar",
         usages: [
             ["mention"]
         ],
@@ -202,6 +224,90 @@ var commands = {
             }
         },
         permissions: { global: true }
+    },
+    "iam": {
+		name: "iam",
+        usages: [
+            ["role"]
+        ],
+        description: "Assigns you a self assignable role. User .listroles for a list of assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            var result = roleManager.iam(message,usage.parameters["role"],dataHandlers.roles.data);
+            if(result)
+                client.sendMessage(message.channel,`Alright, you now have the "${usage.parameters["role"]}" role!`);
+            else
+                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .lsar for a list of assignable roles.`);
+            return true;
+        },
+        permissions: { global: true }
+    },
+    "iamnot":{
+        name: "iamnot",
+        usages: [
+            ["role"]
+        ],
+        description: "Removes a self assignable role from you.",
+        process: function(client, message, usage, dataHandlers){
+            result = roleManager.iamnot(message,usage.parameters["role"], dataHandlers.roles.data)
+            client.sendMessage(message.channel, result.message)
+            return true;
+        },
+        permissions: {global: true }
+    },
+    "whatami": {
+		name: "whatami",
+        usages: [
+            [],
+            ["mention"]
+        ],
+        description: "Returns the list of all the self assignable roles of you or your target.",
+        process: function (client, message, usage,dataHandlers) {
+            var temp = message.author;
+            if(usage.usageid == 1)
+                if(mesage.mentions.length > 0)
+                    temp = message.mentions[0];
+                else
+                    return false;
+            client.sendMessage(message.channel,roleManager.whatami(message,temp,dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: true }
+    },
+    "listroles": {
+		name: "listroles",
+        usages: [
+            []
+        ],
+        description: "Returns the list of self assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.lsar(message,dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: true }
+    },
+    "addrole": {
+		name: "addrole",
+        usages: [
+            ["role"]
+        ],
+        description: "Adds a role to the list of self assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.asar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "removerole": {
+		name: "removerole",
+        usages: [
+            ["role"]
+        ],
+        description: "Removes a role to the list of self assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.dsar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
     }/*,
     "": {
         usages: [

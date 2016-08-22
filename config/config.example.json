@@ -3,5 +3,6 @@
     "ownerids": [
         
     ],
-    "saveInterval": 5
+    "saveInterval": 5,
+    "status" : ""
 }

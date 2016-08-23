@@ -96,7 +96,7 @@ client.on("message", function(message) {
         return;
     }*/ //deprecated with new module handling.
 
-    if (message.content === "ayy") {
+    if (message.content.toLowerCase() === "ayy") {
         client.sendMessage(message.channel, "lmao");
         return;
     }

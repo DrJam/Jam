@@ -25,22 +25,22 @@ permissions.hasPermissions = function(mod,server,author, command){
 
     if(perms.blacklist){//on blacklist, thus if you have a role
         for(var a = 0; a < perms.roles.length; a++){
-            r = perms.roles[a];
-            if(server.memberHasRole(author,r))
+            r = server.roles.find(function(x){return x.id = perms.roles[a]});
+            if(r != undefined && author.hasRole(r))
                 return false;
         }
         return true;
     }
     else{
-        var highestRole = 0;authorRoles= server.rolesOfUser(author);
+        var highestRole = 0;var authorRoles= server.rolesOfUser(author);
         for(var a = 0; a < authorRoles.length;a++){
             r = authorRoles[a];
             if(highestRole< r.position)
                 highestRole = r.position;
         }
         for(var a = 0; a < perms.roles.length;a++){
-            r = perms.roles[a];
-            if(highestRole>r.position)
+            r = server.roles.find(function(x){return x.id = perms.roles[a]});
+            if(r!= undefined && highestRole>=r.position)
                 return true;
         }
         return false;

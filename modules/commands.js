@@ -1,5 +1,6 @@
 ﻿var me = require("./me.js");
-var roleManager = require("./iam.js")
+var roleManager = require("./iam.js");
+var permissions = require("./permissionCommands.js");
 
 var commands = {
     "ping": {
@@ -308,17 +309,115 @@ var commands = {
             return true;
         },
         permissions: { global: false }
+    },
+    "blacklist": {
+        name: "blacklist",
+        usages: [
+            ["command"],
+            ["command", "true/false"]
+        ],
+        description: "Gets or sets whether or not the specified command uses a blacklist.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            if(usage.usageid == 0)
+                result = permissions.getBlacklist(permissions, message, usage.parameters.command, dataHandlers.permissions.data);
+            else
+                result = permissions.blacklist(permissions, message, usage.parameters.command, usage.parameters["true/false"], dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value
+        },
+        permissions: { global: false }
+    },
+    "roleperms": {
+        name: "roleperms",
+        usages: [
+            ["command", "add/remove", "role"]
+        ],
+        description: "Adds or removes a role to a command. What that does exactly depends on whether or not this command is using a blacklist or not.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            switch(usage.parameters["add/remove"].toLowerCase())
+            {
+                case "add": case "+":
+                    result = permissions.addRole(permissions, message, usage.parameters.command, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                case "remove": case "delete": case "rem": case "del": case "-"://added a few overloads
+                    result = permissions.deleteRole(permissions, message, usage.parameters.command, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                default: result = {"value": false}; break;
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "userperms": {
+        name: "userperms",
+        usages: [
+            ["command", "mention"],
+            ["command", "mention", "allow/deny"]
+        ],
+        description: "Removes a user's explicit permissions for a command or adds them. These permission override role restrictions.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            switch(usage.usageid)
+            {
+                case 1:
+                    result = permissions.addUser(permissions, message, usage.parameters.command, usage.parameters["allow/deny"], dataHandlers.permissions.data);
+                    break;
+                case 0:
+                    result = permissions.deleteUser(permissions, message, usage.parameters.command, dataHandlers.permissions.data);
+                    break;
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "resetperms": {
+        name: "resetperms",
+        usages: [
+            ["command"]
+        ],
+        description: "Resets all permissions for a command",
+        process: function (client, message, usage, dataHandlers) {
+            var result = permissions.reset(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "listperms": {
+        name: "resetperms",
+        usages: [
+            ["command"]
+        ],
+        description: "Lists all permissions for a command",
+        process: function (client, message, usage, dataHandlers) {
+            var result = permissions.list(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
     }/*,
     "": {
+        name: "",
         usages: [
             []
         ],
         description: "",
-        process: function (client, message, usage) {
+        process: function (client, message, usage, dataHandlers) {
         },
         permissions: { global: true }
     }
     */
 };
+
+permissions.commands = commands;
 
 module.exports = commands;

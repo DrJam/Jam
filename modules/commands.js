@@ -118,13 +118,13 @@ var commands = {
                             output += " " + days + " days";
                         if(days == 1)
                             output += " 1 day";
-                        if(mins==0 && days>0)
-                            output += " and"
+                        if(mins>0 && hours>0 && days>0)
+                            output += ",";
                         if (hours > 1)
                             output += " " + hours + " hours";
                         if(hours == 1)
                             output += " 1 hour";
-                        if(days+hours > 0)
+                        if(days+hours > 0 && mins>0)
                             output += " and"
                         if (mins > 1)
                             output += " " + mins + " minutes";

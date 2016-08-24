@@ -22,7 +22,7 @@ var commands = {
         ],
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
-            client.sendMessage(message.channel, "These are the servers I'm connected to:\n"+client.servers);
+            client.sendMessage(message.channel, "These are the servers I'm connected to:\n"+client.servers.join(",\n"));
             return true;
         },
         permissions: { global: true, restricted: true }

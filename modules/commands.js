@@ -163,13 +163,19 @@ var commands = {
             ["command"]
         ],
         description: "This command provides help of a specified command. If the target command is omitted, it just gives some info",
-        process: function (client, message, usage) {
+        process: function (client, message, usage,dataHandlers) {
             var output = "";
             if(usage.usageid == 0){
-                output = "**Type \".help\" followed by a space and another of my commands to get help about it!**\n I have the following commands available:";
-                for(var i in commands)
+                var returnal = permissions.help(permissions,message,dataHandlers.permissions.data);
+                if(returnal.length>0){
+                    output = "**Type \".help\" followed by a space and another of my commands to get help about it!**\n You can utilise the following commands available:";
+                    for(var i in returnal)
+                    {
+                        output+="\n:small_blue_diamond: ."+returnal[i];
+                    }
+                }else
                 {
-                    output+="\n:small_blue_diamond: ."+i;
+                    output = "It seems like you cannot utilise any of my commands, contact the server owner (or someone else in charge of permissions) if you believe to see this message incorrectly.";
                 }
             }
             if(usage.usageid == 1){
@@ -392,7 +398,7 @@ var commands = {
         permissions: { global: false }
     },
     "listperms": {
-        name: "resetperms",
+        name: "listperms",
         usages: [
             ["command"]
         ],

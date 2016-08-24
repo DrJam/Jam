@@ -1,4 +1,5 @@
 permissions = {};
+permissions.config = require("../config/config.json");
 
 permissions.addRole = function(mod, message,command,role,data)
 {
@@ -183,6 +184,76 @@ permissions.list = function(mod, message, command, data)
         {output+="\n```"+output2+"```"}
     }
     return {"value":true, "message": output};
+}
+
+permissions.help = function(mod, message, data)
+{
+    var returnal = [];
+    var perms = data[message.server.id];
+    if(mod.config.ownerids.find(function(x){return x==message.author.id})!=undefined)//check for botowner
+    {
+        for(var comm in mod.commands)
+        {
+            var command = mod.commands[comm];
+            returnal.push(command.name);
+        }
+        return returnal;
+    }
+    if(message.server.owner.id == message.author.id){//check for server owner
+        for(var comm in mod.commands)
+        {
+            var command = mod.commands[comm];
+            if(command.permissions.restricted == undefined)   
+             returnal.push(command.name);
+        }
+        return returnal;
+    }
+
+    //No (server/bot) owner.
+    var authorRoles = message.server.rolesOfUser(message.author);
+    var permLevel = 0;
+    for(var r in authorRoles)//Get highest role.
+    {
+        if(authorRoles[r].position > permLevel) permLevel = authorRoles[r].position
+    }
+
+    for(var comm in mod.commands)//iterate through the commands
+    {
+        var command = mod.commands[comm];
+        if(!command.permissions.restricted){//skip restricted commands
+            var userPerms = perms[command.name].users[message.author.id];//Get user specific permissions
+            if(userPerms){//has permissions, skip all further checks
+                returnal.push(command.name);
+                continue;
+            }
+            if(userPerms === false)//has explicitily no permissions, skip further checks.
+                continue;
+            //then, user has no specific permissions,
+            if(perms[command.name].blacklist){//check if we are using a blacklist.
+                var hasPerms =  true;
+                for(var a = 0; a< perms[command.name].roles.length;a++){//iterate through listed roles for this user;
+                    if(message.author.hasRole(perms[command.name].roles[a])){//because this is a blacklist, break on finding a matching role.
+                        hasPerms = false;
+                        break;
+                    }
+                }
+                if(hasPerms)
+                    returnal.push(command.name);
+            }else{//We are using a whitelist.
+                var hasPerms = false;
+                for(var a = 0; a < perms[command.name].roles.length;a++){
+                    r = message.server.roles.find(function(x){return x.id = perms[command.name].roles[a]});
+                    if(r!= undefined && permLevel>=r.position){
+                        returnal.push(command.name);
+                        hasPerms = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }//end command iterator
+    
+    return returnal;
 }
 
 module.exports = permissions;

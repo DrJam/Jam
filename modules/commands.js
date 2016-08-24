@@ -231,13 +231,13 @@ var commands = {
         usages: [
             ["role"]
         ],
-        description: "Assigns you a self assignable role. User .listroles for a list of assignable roles.",
+        description: "Assigns you a self assignable role. Use .listroles for a list of assignable roles.",
         process: function (client, message, usage,dataHandlers) {
             var result = roleManager.iam(message,usage.parameters["role"],dataHandlers.roles.data);
             if(result)
                 client.sendMessage(message.channel,`Alright, you now have the "${usage.parameters["role"]}" role!`);
             else
-                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .lsar for a list of assignable roles.`);
+                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .listroles for a list of assignable roles.`);
             return true;
         },
         permissions: { global: true }

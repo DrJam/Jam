@@ -420,7 +420,8 @@ var commands = {
         process: function (client, message, usage, dataHandlers) {
             var _output = [];
             function print(line){_output.push(line);};
-            eval(usage.parameters.expression);
+            try{eval(usage.parameters.expression);}
+            catch(E){print(`Following error was encountered: ${E.message}`);}
             client.sendMessage(message.channel, _output.join("\n"));
             return true;
         },

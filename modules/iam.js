@@ -95,7 +95,8 @@ roleManager.lsar = function(message, data)
     var output = "I have the following self assignable roles listed:\n";
     for(var a = 0; a < data[message.server.id].length; a++){
         if(a!=0) output+=", ";
-        var name = getFromId(message.server,data[message.server.id][a]).name;
+        var name = getFromId(message.server,data[message.server.id][a])
+        if(name !== undefined) name = name.name;
         if(name.includes(" ")) name = `"${name}"`;
         output+=name;
     }

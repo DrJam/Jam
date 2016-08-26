@@ -43,7 +43,7 @@ permissions.deleteRole =  function (mod, message, command, role, data)
         if(data[message.server.id][command].blacklist)
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`);
         else
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role longer permitted to use ${command}.`);
+            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`);
 
     return {"value": true, "message": "Role succesfully removed!"};
 }

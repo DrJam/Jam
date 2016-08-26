@@ -410,7 +410,23 @@ var commands = {
             return result.value;
         },
         permissions: { global: false }
-    }/*,
+    },
+    "eval" : {
+        name : "eval",
+        usages: [
+            ["expression"]
+        ],
+        description: "Eval is evil",
+        process: function (client, message, usage, dataHandlers) {
+            var _output = [];
+            function print(line){_output.push(line);};
+            eval(usage.parameters.expression);
+            client.sendMessage(message.channel, _output.join("\n"));
+            return true;
+        },
+        permissions: {global: false, restricted: true}
+    }
+    /*,
     "": {
         name: "",
         usages: [

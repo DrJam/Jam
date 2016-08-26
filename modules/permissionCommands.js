@@ -38,6 +38,7 @@ permissions.deleteRole =  function (mod, message, command, role, data)
     
     data[message.server.id][command].roles.splice(index,1);
 
+    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         if(data[message.server.id][command].blacklist)
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`);

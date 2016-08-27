@@ -243,7 +243,7 @@ permissions.help = function(mod, message, data)
             }else{//We are using a whitelist.
                 var hasPerms = false;
                 for(var a = 0; a < perms[command.name].roles.length;a++){
-                    r = message.server.roles.find(function(x){return x.id = perms[command.name].roles[a]});
+                    r = message.server.roles.find(function(x){return x.id == perms[command.name].roles[a]});
                     if(r!= undefined && permLevel>=r.position){
                         returnal.push(command.name);
                         hasPerms = true;

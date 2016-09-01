@@ -389,9 +389,9 @@ var commands = {
             ["add/remove", "role"]
         ],
         description: "Removes a role from the ignored roles list, or adds one to it. Roles on this list are ignored when checking the maximum permission for a user.",
-        proces: function(client, message, usage, dataHandlers)
+        process: function(client, message, usage, dataHandlers)
         {
-            if(usage.usageid == 0)
+            if(usage.usageid == 1)
                 return false;
             var result;
             switch(usage.parameters["add/remove"].toLowerCase())

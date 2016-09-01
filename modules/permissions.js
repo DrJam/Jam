@@ -6,7 +6,7 @@ permissions.assertExistence = function(server)
     if(data[server.id] == undefined)
         data[server.id] = {};
     if(data[server.id]._ignoredRoles == undefined)
-        data[server.id]._ignoredRoles = {};
+        data[server.id]._ignoredRoles = [];
     for(var a in permissions.commands)
     {
         if(data[server.id][a] == undefined && !permissions.commands[a].permissions.restricted)
@@ -26,7 +26,7 @@ permissions.hasPermissions = function(mod,server,author, command){
     if(perms.users[author.id] != undefined)
         return perms.users[author.id];//personal permissions override everything.
 
-    if(perms.blacklist){//on blacklist, thus if you have a role
+    if(perms.blacklist){//on blacklist, thus if you have a role, you don't have permission
         for(var a = 0; a < perms.roles.length; a++){
             r = server.roles.find(function(x){return x.id == perms.roles[a]});
             if(r != undefined && author.hasRole(r))

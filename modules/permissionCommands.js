@@ -135,6 +135,47 @@ permissions.getBlacklist = function(mod, message, command, data)
     return {"value": true, "message": `${output}`};
 }
 
+permissions.addIgnoredRole = function(mod, message, role, data)
+{
+    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    if(role ==undefined)
+        return {"value": true , "message" : "That role does not exist!"};
+
+    server = message.server;
+
+    if(data[server.id]._ignoredRoles.findIndex(function(x){return x == role.id}) != -1)
+        return {"value": true , "message" : "That role is already ignored!"};
+    
+    data[server.id]._ignoredRoles.push(role.id);
+
+    var logChannel = server.channels.find(function(x){return x.name == "logs";});
+    if(logChannel!= undefined)
+        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} added ${role.name} to the list of ignored roles for permissions.`)
+    
+    return {"value": true , "message" : `${role.name}  was added to the list of ignored roles for permissions checking.`};
+}
+
+permissions.removeIgnoredRole = function(mod,message, role, data){
+
+    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    if(role ==undefined)
+        return {"value": true , "message" : "That role does not exist!"};
+
+    server = message.server;
+
+    var index = data[server.id]._ignoredRoles.findIndex(function(x){return x == role.id});
+    if(index == -1)
+        return {"value": true , "message" : "That role isn't being ignored!"};
+    
+    data[server.id]._ignoredRoles.splice(index,1);
+
+    var logChannel = server.channels.find(function(x){return x.name == "logs";});
+    if(logChannel!= undefined)
+        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} removed ${role.name} from the list of ignored roles for permissions.`)
+    
+    return {"value": true , "message" : `${role.name}  was removed to the list of ignored roles for permissions checking.`};
+}
+
 permissions.reset = function(mod, message, command, data)
 {
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
@@ -215,7 +256,8 @@ permissions.help = function(mod, message, data)
     var permLevel = 0;
     for(var r in authorRoles)//Get highest role.
     {
-        if(authorRoles[r].position > permLevel) permLevel = authorRoles[r].position
+        if(perms._ignoredRoles.find(function(x){return r.id == x}) == undefined && authorRoles[r].position > permLevel)
+            permLevel = authorRoles[r].position;
     }
 
     for(var comm in mod.commands)//iterate through the commands

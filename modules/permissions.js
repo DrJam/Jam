@@ -5,6 +5,8 @@ permissions.assertExistence = function(server)
     var data = permissions.data;
     if(data[server.id] == undefined)
         data[server.id] = {};
+    if(data[server.id]._ignoredRoles == undefined)
+        data[server.id]._ignoredRoles = {};
     for(var a in permissions.commands)
     {
         if(data[server.id][a] == undefined && !permissions.commands[a].permissions.restricted)
@@ -20,6 +22,7 @@ permissions.hasPermissions = function(mod,server,author, command){
         return true;//bot and server owners are allowed everything according to Dan.
 
     var perms = mod.data[server.id][command.name];
+    var igRoles = mod.data[server.id]._ignoredRoles
     if(perms.users[author.id] != undefined)
         return perms.users[author.id];//personal permissions override everything.
 
@@ -35,7 +38,7 @@ permissions.hasPermissions = function(mod,server,author, command){
         var highestRole = 0;var authorRoles= server.rolesOfUser(author);
         for(var a = 0; a < authorRoles.length;a++){
             r = authorRoles[a];
-            if(highestRole< r.position)
+            if(igRoles.find(function(x){return r.id == x}) == undefined && highestRole<r.position)
                 highestRole = r.position;
         }
         for(var a = 0; a < perms.roles.length;a++){
@@ -73,11 +76,17 @@ permissions.serverDeleted = function(mod,client,server)
 
 permissions.serverRoleDeleted = function(mod, client,role)
 {
-    for(var a = 0;a < mod.data[role.server.id];a++)
+    var index = mod.data[role.server.id]._ignoredRoles.findIndex(function(x){return x == role.id;})
+    if(x!=-1){
+        mod.data[role.server.id]._ignoredRoles.splice(index,1);
+    }
+    /*
+    for(var a = 0;a < mod.data[role.server.id].length;a++)
         if(mod.data[role.server.id].roles[a].id == role.id){
             mod.data[role.server.id].roles.splice(a,1);
             break;
         }
+        */
 }
 
 permissions.events = {
@@ -88,68 +97,3 @@ permissions.events = {
 }
 
 module.exports = permissions;
-/*var p = {}
-try {
-	p.permissions = require("./permissions.json");
-} catch (e) {
-	throw "Cannot find \"permissions.json\"";
-}
-
-p.userHasPermission = function (user, server, command) {
-    if (user.id === server.owner.id)
-        return true;
-
-    var userRoles = server.getUserRoles(user);
-    
-    if (!p.serverExists(server))
-        return false;
-
-    if (!p.commandExistsForServer(server,command))
-        return false;
-
-    if (p.userDefinedForCommand(command, user))
-        return p.permissions[server.id][command][users][user.id];
-
-    var highestRole = undefined;
-    for (var role in userRoles) {
-        if (!p.roleDefinedForCommand(command, role))
-            continue;
-
-        if (highestRole == undefined)
-            highestRole = role;
-        else if (role.position > highestRole.position)
-            highestRole = role;
-    }
-    if (highestRole != undefined)
-        return p.permissions[server.id][command][roles][highestRole.id];
-
-    if (p.permissions[server.id][command].hasOwnProperty("all"))
-        return p.permissions[server.id][command]["all"];
-
-    return false;
-};
-
-p.serverExists = function(server) {
-    return p.permissions.hasOwnProperty(server.id)
-}
-
-p.commandExistsForServer = function(server, command) {
-    return p.serverExists(server) ? 
-    	p.permissions[server.id].hasOwnProperty(command)
-    	: false;
-}
-
-p.userDefinedForCommand = function(server, command, user) {
-	return p.commandExistsForServer(server, command) ?
-		p.permissions[server.id][command][users].hasOwnProperty(user.id) 
-		: false;
-}
-
-p.roleDefinedForCommand = function(server, command, role) {
-	return p.commandExistsForServer(server, command) ?
-		p.permissions[server.id][command][roles].hasOwnProperty(role.id)
-		: false;
-}
-
-module.exports = p;
-*/

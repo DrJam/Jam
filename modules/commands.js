@@ -383,6 +383,34 @@ var commands = {
         },
         permissions: { global: false }
     },
+    "ignoredroles":{
+        name: "ignoredroles",
+        usages : [
+            ["add/remove", "role"]
+        ],
+        description: "Removes a role from the ignored roles list, or adds one to it. Roles on this list are ignored when checking the maximum permission for a user.",
+        proces: function(client, message, usage, dataHandlers)
+        {
+            if(usage.usageid == 0)
+                return false;
+            var result;
+            switch(usage.parameters["add/remove"].toLowerCase())
+            {
+                case "add": case "+":
+                    result = permissions.addIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                case "remove": case "delete": case "rem": case "del": case "-":
+                    result = permissions.removeIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                default: result = {"value": false}; break;
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: {global: false}
+
+    },
     "resetperms": {
         name: "resetperms",
         usages: [

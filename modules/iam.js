@@ -37,7 +37,7 @@ roleManager.iam = function(message, role, data)
         message.author.addTo(role);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`);
+            message.client.sendMessage(logChannel,`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
         return true;
     }else
         return false;
@@ -54,7 +54,7 @@ roleManager.iamnot = function(message,role,data)
             message.author.removeFrom(role);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`Removed ${role.name} from ${message.author.username}#${message.author.discriminator} per that user's request.`);
+                message.client.sendMessage(logChannel,`Removed ${role.name} from ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
             return {"value":true, "message":"Role succesfully removed!"};
             
         }else{
@@ -117,7 +117,7 @@ roleManager.asar = function(message,role,data)//we need permissions before addin
         data[server.id].push(role.id);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of self assignable roles.`);
+            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of self assignable roles.`,{"disableEveryone":true});
         return `"${role.name}" added to the list of assignable roles!`;
     }
 }
@@ -142,7 +142,7 @@ roleManager.dsar = function(message, role, data)
             data[server.id].splice(index,1);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of self assignable roles.`);
+                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of self assignable roles.`,{"disableEveryone":true});
             return `Deleted ${role.name} from self assignable list.`
         }
         return "I don't have a self assignable role named that way."

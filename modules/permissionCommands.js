@@ -15,9 +15,9 @@ permissions.addRole = function(mod, message,command,role,data)
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         if(data[message.server.id][command].blacklist)
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made ${role.name} role NO LONGER allowed to use ${command}.`);
+            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made ${role.name} role NO LONGER allowed to use ${command}.`,{"disableEveryone":true});
         else
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made all roles above and including ${role.name} now allowed to use ${command}.`);
+            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made all roles above and including ${role.name} now allowed to use ${command}.`,{"disableEveryone":true});
 
     return {"value": true, "message": "Role succesfully added."};
 
@@ -41,9 +41,9 @@ permissions.deleteRole =  function (mod, message, command, role, data)
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         if(data[message.server.id][command].blacklist)
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`);
+            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`,{"disableEveryone":true});
         else
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`);
+            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`,{"disableEveryone":true});
 
     return {"value": true, "message": "Role succesfully removed!"};
 }
@@ -71,7 +71,7 @@ permissions.addUser =  function(mod, message,command,value,data)
 
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} added explicit permissions on \`${command}\` for ${user.name}#${user.discriminator} which were set to "${value}"`);
+        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} added explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} which were set to "${value}"`);
     return {"value": true, "message": output}; 
 }
 
@@ -90,7 +90,7 @@ permissions.deleteUser = function(mod, message,command,data)
     
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} removed explicit permissions on \`${command}\` for ${user.name}#${user.discriminator} `);
+        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} removed explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} `);
 
     delete data[message.server.id][command].users[user.id];
     return {"value": true, "message": "Associated permissions for this user are now forgotten."};
@@ -116,7 +116,7 @@ permissions.blacklist = function(mod, message, command, value, data)
 
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} switched ${command} to a ${listType}. All associated role permissions have been wiped.`);
+        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} switched ${command} to a ${listType}. All associated role permissions have been wiped.`,{"disableEveryone":true});
 
     return {"value": true, "message": `Command succesfully switched to ${listType}. All associated roles have been wiped.`};
 }
@@ -135,6 +135,72 @@ permissions.getBlacklist = function(mod, message, command, data)
     return {"value": true, "message": `${output}`};
 }
 
+permissions.addIgnoredRole = function(mod, message, role, data)
+{
+    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    if(role ==undefined)
+        return {"value": true , "message" : "That role does not exist!"};
+
+    server = message.server;
+
+    if(data[server.id]._ignoredRoles.find(function(x){return x == role.id}) != undefined)
+        return {"value": true , "message" : "That role is already ignored!"};
+    
+    data[server.id]._ignoredRoles.push(role.id);
+
+    var logChannel = server.channels.find(function(x){return x.name == "logs";});
+    if(logChannel!= undefined)
+        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} added ${role.name} to the list of ignored roles for permissions.`,{"disableEveryone":true})
+    
+    return {"value": true , "message" : `${role.name}  was added to the list of ignored roles for permissions checking.`};
+}
+
+permissions.removeIgnoredRole = function(mod,message, role, data){
+
+    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    if(role ==undefined)
+        return {"value": true , "message" : "That role does not exist!"};
+
+    server = message.server;
+
+    var id = data[server.id]._ignoredRoles.find(function(x){return x == role.id});
+    if(id == undefined)
+        return {"value": true , "message" : "That role isn't being ignored!"};
+    
+    data[server.id]._ignoredRoles.splice(data[server.id]._ignoredRoles.indexOf(id),1);
+
+    var logChannel = server.channels.find(function(x){return x.name == "logs";});
+    if(logChannel!= undefined)
+        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} removed ${role.name} from the list of ignored roles for permissions.`,{"disableEveryone":true})
+    
+    return {"value": true , "message" : `${role.name}  was removed to the list of ignored roles for permissions checking.`};
+}
+
+permissions.listIgnoredRoles = function(message,data){
+    server = message.server;
+    var outputList = [];
+    for(var a = 0; a<data[server.id]._ignoredRoles.length;a++)
+    {
+        var role = data[server.id]._ignoredRoles[a];
+        role = server.roles.find(function(x){return x.id == role});
+        if(role == undefined){//role no longer exists, so just clean it up
+            data[server.id]._ignoredRoles.splice(a,1);
+            a--;
+        }
+        else
+        {
+            var temp = role.name;
+            if(temp.includes(" "))
+                temp = "\""+temp+"\"";
+            outputList.push(temp);
+        }
+    }
+    if(outputList.length>0)
+        return {"value":true, "message": `I am ignoring the following roles whenever I check for permissions:\n${outputList.join(", ")}`};
+    else
+        return {"value":true, "message": `I am not ignoring any roles when checking for permissions.`};
+}
+
 permissions.reset = function(mod, message, command, data)
 {
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
@@ -144,7 +210,7 @@ permissions.reset = function(mod, message, command, data)
     
     logChannel = message.server.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} reset the permissions for ${command}`);
+        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} reset the permissions for ${command}`,{"disableEveryone":true});
 
     return {"value": true, "message": `Permissions for "${command}" have been reset!`};
 }
@@ -215,7 +281,8 @@ permissions.help = function(mod, message, data)
     var permLevel = 0;
     for(var r in authorRoles)//Get highest role.
     {
-        if(authorRoles[r].position > permLevel) permLevel = authorRoles[r].position
+        if(perms._ignoredRoles.find(function(x){return authorRoles[r].id == x}) == undefined && authorRoles[r].position > permLevel)
+            permLevel = authorRoles[r].position;
     }
 
     for(var comm in mod.commands)//iterate through the commands

@@ -378,10 +378,41 @@ var commands = {
                     break;
             }
             if(result.value)
-                client.sendMessage(message.channel, result.message);
+                client.sendMessage(message.channel, result.message,{disableEveryone : true});
             return result.value;
         },
         permissions: { global: false }
+    },
+    "ignoredroles":{
+        name: "ignoredroles",
+        usages : [
+            [],
+            ["add/remove", "role"]
+        ],
+        description: "Removes a role from the ignored roles list, or adds one to it. Roles on this list are ignored when checking the maximum permission for a user.",
+        process: function(client, message, usage, dataHandlers)
+        {
+            var result;
+            if(usage.usageid == 0)
+                result = permissions.listIgnoredRoles(message,dataHandlers.permissions.data);
+            else{
+                switch(usage.parameters["add/remove"].toLowerCase())
+                {
+                    case "add": case "+":
+                        result = permissions.addIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                        break;
+                    case "remove": case "delete": case "rem": case "del": case "-":
+                        result = permissions.removeIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                        break;
+                    default: result = {"value": false}; break;
+                }
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: {global: false}
+
     },
     "resetperms": {
         name: "resetperms",
@@ -422,7 +453,10 @@ var commands = {
             function print(line){_output.push(line);};
             try{eval(usage.parameters.expression);}
             catch(E){print(`Following error was encountered: ${E.message}`);}
-            client.sendMessage(message.channel, _output.join("\n"));
+            if(_output.length>0)
+                client.sendMessage(message.channel,_output.join("\n"));
+            else
+                client.sendMessage(message.channel, "No output.");
             return true;
         },
         permissions: {global: false, restricted: true}

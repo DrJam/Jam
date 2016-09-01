@@ -176,6 +176,31 @@ permissions.removeIgnoredRole = function(mod,message, role, data){
     return {"value": true , "message" : `${role.name}  was removed to the list of ignored roles for permissions checking.`};
 }
 
+permissions.listIgnoredRoles = function(message,data){
+    server = message.server;
+    var outputList = [];
+    for(var a = 0; a<data[server.id]._ignoredRoles.length;a++)
+    {
+        var role = data[server.id]._ignoredRoles[a];
+        role = server.roles.find(function(x){return x.id == role});
+        if(role == undefined){//role no longer exists, so just clean it up
+            data[server.id]._ignoredRoles.splice(a,1);
+            a--;
+        }
+        else
+        {
+            var temp = role.name;
+            if(temp.includes(" "))
+                temp = "\""+temp+"\"";
+            outputList.push(temp);
+        }
+    }
+    if(outputList.length>0)
+        return {"value":true, "message": `I am ignoring the following roles whenever I check for permissions:\n${outputList.join(", ")}`};
+    else
+        return {"value":true, "message": `I am not ignoring any roles when checking for permissions.`};
+}
+
 permissions.reset = function(mod, message, command, data)
 {
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
@@ -256,7 +281,7 @@ permissions.help = function(mod, message, data)
     var permLevel = 0;
     for(var r in authorRoles)//Get highest role.
     {
-        if(perms._ignoredRoles.find(function(x){return r.id == x}) == undefined && authorRoles[r].position > permLevel)
+        if(perms._ignoredRoles.find(function(x){return authorRoles[r].id == x}) == undefined && authorRoles[r].position > permLevel)
             permLevel = authorRoles[r].position;
     }
 

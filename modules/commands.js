@@ -450,7 +450,7 @@ var commands = {
             function print(line){_output.push(line);};
             try{eval(usage.parameters.expression);}
             catch(E){print(`Following error was encountered: ${E.message}`);}
-            client.sendMessage(message.channel, _output.join("\n"));
+            client.sendMessage(message.channel,(_output.length>0) ? _output.join("\n") : "Code executed without errors.");
             return true;
         },
         permissions: {global: false, restricted: true}

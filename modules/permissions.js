@@ -76,17 +76,24 @@ permissions.serverDeleted = function(mod,client,server)
 
 permissions.serverRoleDeleted = function(mod, client,role)
 {
-    var index = mod.data[role.server.id]._ignoredRoles.findIndex(function(x){return x == role.id;})
-    if(x!=-1){
-        mod.data[role.server.id]._ignoredRoles.splice(index,1);
-    }
-    /*
-    for(var a = 0;a < mod.data[role.server.id].length;a++)
-        if(mod.data[role.server.id].roles[a].id == role.id){
-            mod.data[role.server.id].roles.splice(a,1);
-            break;
+    var logChannel = role.server.channels.find(function(x){return x.name == "logs";});
+    for(var key in mod.data[role.server.id]){
+        if(key!="_ignoredRoles"){
+            var index = mod.data[role.server.id][key].roles.findIndex(function(x){return x == role.id;})
+            if(index!=-1){
+                mod.data[role.server.id][key].roles.splice(index,1);
+                if(logChannel!=undefined)
+                    client.sendMessage(logChannel,`Removed ${role.name} from ${key} permissions as it was deleted.`);
+            }
+        }else{
+            var index = mod.data[role.server.id][key].findIndex(function(x){return x == role.id;})
+            if(index!=-1){
+                mod.data[role.server.id][key].splice(index,1);
+                if(logChannel!=undefined)
+                    client.sendMessage(logChannel,`Removed ${role.name} from the ignored roles as it was deleted.`);
+            }
         }
-        */
+    }
 }
 
 permissions.events = {

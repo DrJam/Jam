@@ -97,9 +97,16 @@ roleManager.lsar = function(message, data)
     for(var a = 0; a < data[message.server.id].length; a++){
         if(a!=0) output+=", ";
         var name = getFromId(message.server,data[message.server.id][a])
-        if(name !== undefined) name = name.name;
-        if(name.includes(" ")) name = `"${name}"`;
-        output+=name;
+        if(name !== undefined){
+             name = name.name;
+            if(name.includes(" ")) name = `"${name}"`;
+            output+=name;
+        }else{
+            data[message.server.id].splice(a,1);
+            var logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+            if(logChannel!=undefined)
+                message.client.sendMessage(logChannel,`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
+        }
     }
     return output;
 }

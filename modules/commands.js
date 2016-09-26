@@ -261,6 +261,52 @@ var commands = {
         },
         permissions: {global: true }
     },
+    "giverole": {
+		name: "giverole",
+        usages: [
+            ["@mention","role"]
+        ],
+        description: "Assigns the mentioned user an assignable role. Use .listgiveroles for a list of assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+             if(message.mentions.length > 0)
+                    target = message.mentions[0];
+                else
+                    return false;
+            try{
+                let result = roleManager.theyam(message,usage.parameters["role"],target,dataHandlers.roles.data);
+                if(result)
+                client.sendMessage(message.channel,`Alright, They now have the "${usage.parameters["role"]}" role!`);
+            else
+                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .listgiveroles for a list of assignable roles.`);
+            }
+            catch(e){
+                client.sendMessage(message.channel,"Something went wrong!");
+            }
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "takerole":{
+        name: "takerole",
+        usages: [
+            ["@mention","role"]
+        ],
+        description: "Removes the assignable role from the mentioned user.",
+        process: function(client, message, usage, dataHandlers){
+            if(message.mentions.length > 0)
+                    target = message.mentions[0];
+                else
+                    return false;
+            try{
+                result = roleManager.theyamnot(message,usage.parameters["role"],target, dataHandlers.roles.data)
+                client.sendMessage(message.channel, result.message);
+            }catch(e){
+                client.sendMessage(message.channel, "Something went wrong!");
+            }
+            return true;
+        },
+        permissions: {global: false }
+    },
     "whatami": {
 		name: "whatami",
         usages: [
@@ -271,7 +317,7 @@ var commands = {
         process: function (client, message, usage,dataHandlers) {
             var temp = message.author;
             if(usage.usageid == 1)
-                if(mesage.mentions.length > 0)
+                if(message.mentions.length > 0)
                     temp = message.mentions[0];
                 else
                     return false;
@@ -292,8 +338,8 @@ var commands = {
         },
         permissions: { global: true }
     },
-    "addrole": {
-		name: "addrole",
+    "asar": {
+		name: "asar",
         usages: [
             ["role"]
         ],
@@ -304,14 +350,50 @@ var commands = {
         },
         permissions: { global: false }
     },
-    "removerole": {
-		name: "removerole",
+     "dsar": {
+		name: "dsar",
         usages: [
             ["role"]
         ],
         description: "Removes a role to the list of self assignable roles.",
         process: function (client, message, usage,dataHandlers) {
             client.sendMessage(message.channel,roleManager.dsar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "listgiveroles": {
+		name: "listgiveroles",
+        usages: [
+            []
+        ],
+        description: "Returns the list of assignable roles (with .giverole).",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.loar(message,dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "aoar": {
+		name: "aoar",
+        usages: [
+            ["role"]
+        ],
+        description: "Adds a role to the list of mod assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.aoar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "doar": {
+		name: "doar",
+        usages: [
+            ["role"]
+        ],
+        description: "Removes a role to the list of assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.doar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }

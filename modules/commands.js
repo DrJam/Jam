@@ -1,5 +1,6 @@
 ﻿var me = require("./me.js");
-var roleManager = require("./iam.js")
+var roleManager = require("./iam.js");
+var permissions = require("./permissionCommands.js");
 
 var commands = {
     "ping": {
@@ -21,7 +22,7 @@ var commands = {
         ],
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
-            client.sendMessage(message.channel, "These are the servers I'm connected to:\n"+client.servers);
+            client.sendMessage(message.channel, "These are the servers I'm connected to:\n"+client.servers.join(",\n"));
             return true;
         },
         permissions: { global: true, restricted: true }
@@ -117,13 +118,13 @@ var commands = {
                             output += " " + days + " days";
                         if(days == 1)
                             output += " 1 day";
-                        if(mins==0 && days>0)
-                            output += " and"
+                        if(mins>0 && hours>0 && days>0)
+                            output += ",";
                         if (hours > 1)
                             output += " " + hours + " hours";
                         if(hours == 1)
                             output += " 1 hour";
-                        if(days+hours > 0)
+                        if(days+hours > 0 && mins>0)
                             output += " and"
                         if (mins > 1)
                             output += " " + mins + " minutes";
@@ -162,13 +163,19 @@ var commands = {
             ["command"]
         ],
         description: "This command provides help of a specified command. If the target command is omitted, it just gives some info",
-        process: function (client, message, usage) {
+        process: function (client, message, usage,dataHandlers) {
             var output = "";
             if(usage.usageid == 0){
-                output = "**Type \".help\" followed by a space and another of my commands to get help about it!**\n I have the following commands available:";
-                for(var i in commands)
+                var returnal = permissions.help(permissions,message,dataHandlers.permissions.data);
+                if(returnal.length>0){
+                    output = "**Type \".help\" followed by a space and another of my commands to get help about it!**\n You can utilise the following commands available:";
+                    for(var i in returnal)
+                    {
+                        output+="\n:small_blue_diamond: ."+returnal[i];
+                    }
+                }else
                 {
-                    output+="\n:small_blue_diamond: ."+i;
+                    output = "It seems like you cannot utilise any of my commands, contact the server owner (or someone else in charge of permissions) if you believe to see this message incorrectly.";
                 }
             }
             if(usage.usageid == 1){
@@ -230,13 +237,13 @@ var commands = {
         usages: [
             ["role"]
         ],
-        description: "Assigns you a self assignable role. User .listroles for a list of assignable roles.",
+        description: "Assigns you a self assignable role. Use .listroles for a list of assignable roles.",
         process: function (client, message, usage,dataHandlers) {
             var result = roleManager.iam(message,usage.parameters["role"],dataHandlers.roles.data);
             if(result)
                 client.sendMessage(message.channel,`Alright, you now have the "${usage.parameters["role"]}" role!`);
             else
-                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .lsar for a list of assignable roles.`);
+                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .listroles for a list of assignable roles.`);
             return true;
         },
         permissions: { global: true }
@@ -254,6 +261,52 @@ var commands = {
         },
         permissions: {global: true }
     },
+    "giverole": {
+		name: "giverole",
+        usages: [
+            ["@mention","role"]
+        ],
+        description: "Assigns the mentioned user an assignable role. Use .listgiveroles for a list of assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+             if(message.mentions.length > 0)
+                    target = message.mentions[0];
+                else
+                    return false;
+            try{
+                let result = roleManager.theyam(message,usage.parameters["role"],target,dataHandlers.roles.data);
+                if(result)
+                client.sendMessage(message.channel,`Alright, They now have the "${usage.parameters["role"]}" role!`);
+            else
+                client.sendMessage(message.channel,`I couldn't find a role named liked that in my list of assignable roles. Use .listgiveroles for a list of assignable roles.`);
+            }
+            catch(e){
+                client.sendMessage(message.channel,"Something went wrong!");
+            }
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "takerole":{
+        name: "takerole",
+        usages: [
+            ["@mention","role"]
+        ],
+        description: "Removes the assignable role from the mentioned user.",
+        process: function(client, message, usage, dataHandlers){
+            if(message.mentions.length > 0)
+                    target = message.mentions[0];
+                else
+                    return false;
+            try{
+                result = roleManager.theyamnot(message,usage.parameters["role"],target, dataHandlers.roles.data)
+                client.sendMessage(message.channel, result.message);
+            }catch(e){
+                client.sendMessage(message.channel, "Something went wrong!");
+            }
+            return true;
+        },
+        permissions: {global: false }
+    },
     "whatami": {
 		name: "whatami",
         usages: [
@@ -264,7 +317,7 @@ var commands = {
         process: function (client, message, usage,dataHandlers) {
             var temp = message.author;
             if(usage.usageid == 1)
-                if(mesage.mentions.length > 0)
+                if(message.mentions.length > 0)
                     temp = message.mentions[0];
                 else
                     return false;
@@ -285,8 +338,8 @@ var commands = {
         },
         permissions: { global: true }
     },
-    "addrole": {
-		name: "addrole",
+    "asar": {
+		name: "asar",
         usages: [
             ["role"]
         ],
@@ -297,8 +350,8 @@ var commands = {
         },
         permissions: { global: false }
     },
-    "removerole": {
-		name: "removerole",
+     "dsar": {
+		name: "dsar",
         usages: [
             ["role"]
         ],
@@ -308,17 +361,202 @@ var commands = {
             return true;
         },
         permissions: { global: false }
-    }/*,
+    },
+    "listgiveroles": {
+		name: "listgiveroles",
+        usages: [
+            []
+        ],
+        description: "Returns the list of assignable roles (with .giverole).",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.loar(message,dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "aoar": {
+		name: "aoar",
+        usages: [
+            ["role"]
+        ],
+        description: "Adds a role to the list of mod assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.aoar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "doar": {
+		name: "doar",
+        usages: [
+            ["role"]
+        ],
+        description: "Removes a role to the list of assignable roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.doar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "blacklist": {
+        name: "blacklist",
+        usages: [
+            ["command"],
+            ["command", "true/false"]
+        ],
+        description: "Gets or sets whether or not the specified command uses a blacklist.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            if(usage.usageid == 0)
+                result = permissions.getBlacklist(permissions, message, usage.parameters.command, dataHandlers.permissions.data);
+            else
+                result = permissions.blacklist(permissions, message, usage.parameters.command, usage.parameters["true/false"], dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value
+        },
+        permissions: { global: false }
+    },
+    "roleperms": {
+        name: "roleperms",
+        usages: [
+            ["command", "add/remove", "role"]
+        ],
+        description: "Adds or removes a role to a command. What that does exactly depends on whether or not this command is using a blacklist or not.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            switch(usage.parameters["add/remove"].toLowerCase())
+            {
+                case "add": case "+":
+                    result = permissions.addRole(permissions, message, usage.parameters.command, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                case "remove": case "delete": case "rem": case "del": case "-"://added a few overloads
+                    result = permissions.deleteRole(permissions, message, usage.parameters.command, usage.parameters.role, dataHandlers.permissions.data);
+                    break;
+                default: result = {"value": false}; break;
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "userperms": {
+        name: "userperms",
+        usages: [
+            ["command", "mention"],
+            ["command", "mention", "allow/deny"]
+        ],
+        description: "Removes a user's explicit permissions for a command or adds them. These permission override role restrictions.",
+        process: function (client, message, usage, dataHandlers) {
+            var result;
+            switch(usage.usageid)
+            {
+                case 1:
+                    result = permissions.addUser(permissions, message, usage.parameters.command, usage.parameters["allow/deny"], dataHandlers.permissions.data);
+                    break;
+                case 0:
+                    result = permissions.deleteUser(permissions, message, usage.parameters.command, dataHandlers.permissions.data);
+                    break;
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message,{disableEveryone : true});
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "ignoredroles":{
+        name: "ignoredroles",
+        usages : [
+            [],
+            ["add/remove", "role"]
+        ],
+        description: "Removes a role from the ignored roles list, or adds one to it. Roles on this list are ignored when checking the maximum permission for a user.",
+        process: function(client, message, usage, dataHandlers)
+        {
+            var result;
+            if(usage.usageid == 0)
+                result = permissions.listIgnoredRoles(message,dataHandlers.permissions.data);
+            else{
+                switch(usage.parameters["add/remove"].toLowerCase())
+                {
+                    case "add": case "+":
+                        result = permissions.addIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                        break;
+                    case "remove": case "delete": case "rem": case "del": case "-":
+                        result = permissions.removeIgnoredRole(permissions, message, usage.parameters.role, dataHandlers.permissions.data);
+                        break;
+                    default: result = {"value": false}; break;
+                }
+            }
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: {global: false}
+
+    },
+    "resetperms": {
+        name: "resetperms",
+        usages: [
+            ["command"]
+        ],
+        description: "Resets all permissions for a command",
+        process: function (client, message, usage, dataHandlers) {
+            var result = permissions.reset(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "listperms": {
+        name: "listperms",
+        usages: [
+            ["command"]
+        ],
+        description: "Lists all permissions for a command",
+        process: function (client, message, usage, dataHandlers) {
+            var result = permissions.list(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
+            if(result.value)
+                client.sendMessage(message.channel, result.message);
+            return result.value;
+        },
+        permissions: { global: false }
+    },
+    "eval" : {
+        name : "eval",
+        usages: [
+            ["expression"]
+        ],
+        description: "Eval is evil",
+        process: function (client, message, usage, dataHandlers) {
+            var _output = [];
+            function print(line){_output.push(line);};
+            try{eval(usage.parameters.expression);}
+            catch(E){print(`Following error was encountered: ${E.message}`);}
+            if(_output.length>0)
+                client.sendMessage(message.channel,_output.join("\n"));
+            else
+                client.sendMessage(message.channel, "No output.");
+            return true;
+        },
+        permissions: {global: false, restricted: true}
+    }
+    /*,
     "": {
+        name: "",
         usages: [
             []
         ],
         description: "",
-        process: function (client, message, usage) {
+        process: function (client, message, usage, dataHandlers) {
         },
         permissions: { global: true }
     }
     */
 };
+
+permissions.commands = commands;
 
 module.exports = commands;

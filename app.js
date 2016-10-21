@@ -89,14 +89,10 @@ client.on("message", function(message) {
     {
         events["message"][i][1](events["message"][i][0],client,message);
     }
-    if (message.author == client.user)
+    if (message.author == client.user || message.author.bot)
         return;
-    /*
-    if (emoji.check(emoji, client, message, config)) {
-        return;
-    }*/ //deprecated with new module handling.
 
-    if (message.content === "ayy") {
+    if (message.content.toLowerCase() === "ayy") {
         client.sendMessage(message.channel, "lmao");
         return;
     }

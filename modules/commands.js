@@ -137,8 +137,8 @@ var commands = {
                     output = "I have not seen you play any games long enough to be relevant.";
                 }
                 client.sendMessage(message.channel, output);
-                return true;
             }
+            return true;
         },
         permissions: { global: true }
     },

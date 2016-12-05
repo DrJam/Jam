@@ -76,7 +76,7 @@ roleManager.theyam = function(message, role, target, data)
     role = getFromName(server,role);
     if(role == undefined)
         return false;
-    if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined){
+    if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
        target.addTo(role);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
@@ -92,7 +92,7 @@ roleManager.theyamnot = function(message,role,target,data)
     role = getFromName(server,role);
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
-    if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined){
+    if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
         if(target.hasRole(role)){
             target.removeFrom(role);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
@@ -158,7 +158,10 @@ roleManager.loar = function(message, data)
 {
     if(!assertServerExistance(message.server,data) || data[message.server.id].otherroles.length == 0)
     {
-        return "I have no assignable roles listed for this server.";
+        if(data[message.server.id].selfroles.length == 0)
+            return "I have no assignable roles listed for this server.";
+        else
+            return "I have no assignable roles listed, but you could assign self-assignable roles."
     }
     var output = "I have the following assignable roles listed:\n";
     for(var a = 0; a < data[message.server.id].otherroles.length; a++){
@@ -189,6 +192,12 @@ roleManager.asar = function(message,role,data)//we need permissions before addin
         if(data[server.id].selfroles.find(function(x){return x == role.id})!=undefined)
             return "This role is already in my list!";
         data[server.id].selfroles.push(role.id);
+        data[server.id].selfroles.sort((x,y) =>
+            {
+                let x_ = server.roles.find(function(z1){return z1.id == x});
+                let y_ = server.roles.find(function(z2){return z2.id == y});
+                return y_.position-x_.position ;
+            })
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
             message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of self assignable roles.`,{"disableEveryone":true});
@@ -207,6 +216,12 @@ roleManager.aoar = function(message,role,data)//we need permissions before addin
         if(data[server.id].otherroles.find(function(x){return x == role.id})!=undefined)
             return "This role is already in my list!";
         data[server.id].otherroles.push(role.id);
+        data[server.id].otherroles.sort((x,y) =>
+            {
+                let x_ = server.roles.find(function(z1){return z1.id == x});
+                let y_ = server.roles.find(function(z2){return z2.id == y});
+                return  y_.position-x_.position;
+            })
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
             message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of assignable roles.`,{"disableEveryone":true});

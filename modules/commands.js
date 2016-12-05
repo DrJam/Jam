@@ -310,25 +310,6 @@ var commands = {
         },
         permissions: {global: false }
     },
-    "whatami": {
-		name: "whatami",
-        usages: [
-            [],
-            ["mention"]
-        ],
-        description: "Returns the list of all the self assignable roles of you or your target.",
-        process: function (client, message, usage,dataHandlers) {
-            var temp = message.author;
-            if(usage.usageid == 1)
-                if(message.mentions.length > 0)
-                    temp = message.mentions[0];
-                else
-                    return false;
-            client.sendMessage(message.channel,roleManager.whatami(message,temp,dataHandlers.roles.data));
-            return true;
-        },
-        permissions: { global: true }
-    },
     "listroles": {
 		name: "listroles",
         usages: [

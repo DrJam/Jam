@@ -107,29 +107,6 @@ roleManager.theyamnot = function(message,role,target,data)
         return {"value":false, "message":"I have no role like that in the assignable list."};
 }
 
-roleManager.whatami = function(message, user, data)
-{
-    var server = message.server;
-    var output = "";
-    if(user.id == message.author.id) output+="You have";
-    else output+= user.name + " has";
-    var output2 = " the following self assignable roles:\n";
-    var roles = server.rolesOfUser(user);
-    var count = 0;
-    for(var a = 0; a<data[server.id].selfroles.length;a++){
-        var role =roles.find(function(x){return x.id == data[server.id][a]})
-        if(role !=undefined)
-        {
-            if(count !=0)output2+=",";
-            output2+=` "${role.name}"`;
-            count++;
-        }
-    }
-    if(count==0)output+= " no self assignable roles."
-    else output+=output2;
-    return output;
-}
-
 roleManager.lsar = function(message, data)
 {
     if(!assertServerExistance(message.server,data) || data[message.server.id].selfroles.length == 0)

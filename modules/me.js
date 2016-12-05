@@ -14,20 +14,6 @@
 
 var me = {};
 
-me.lookup = function(message, usage, fileHandler) {
-    if (!fileHandler.dataLoaded)
-        return "Data not loaded.";
-    var users = resolveName(message.server, usage.parameters.name);
-    if (users.length == 0) {
-        return "No users found, sorry";
-    }
-    var output = "";
-    for (var i = 0; i < users.length; i++) {
-        output += me.getMe(users[i], fileHandler.data) + ((i < users.length - 1) ? "\n" : "");
-    }
-    return output;
-};
-
 me.handle = function(message, usage, fileHandler) {
     if (!fileHandler.dataLoaded)
         return "Data not loaded.";

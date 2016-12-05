@@ -77,12 +77,15 @@ var commands = {
     "lookup": {
 		name: "lookup",
         usages: [
-            ["name"]
+            ["@mention"]
         ],
         description: "Finds the specified user's info.",
         process: function (client, message, usage, dataHandlers) {
-            client.sendMessage(message.channel, me.lookup(message, usage, dataHandlers.me));
-            return true;
+            if(message.mentions.length>0){
+                client.sendMessage(message.channel, me.getMe(message.mentions[0], dataHandlers.me.data));
+                return true;
+            }
+            return false;
         },
         permissions: { global: true }
     },

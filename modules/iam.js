@@ -19,14 +19,20 @@ function getFromName(server,name)
 
 function assertServerExistance(server, data)//returns true if server existed in data and was the correct version prior to this call, otherwise ... false
 {
-    if(data[server.id] == undefined){
-        data[server.id] = {selfroles:[],otherroles:[]};
+     if(data[server.id] == undefined){
+        data[server.id] = {selfroles:[],otherroles:[],autoroles:[]};
         return false;
     }
-    else{//if data is in old format
+    else{//if data is in oldest format
         if(!data[server.id].hasOwnProperty("selfroles")){
-            data[server.id] = {selfroles:data[server.id],otherroles:[]};
+            data[server.id] = {selfroles:data[server.id],otherroles:[],autoroles:[]};
             return false
+        }
+        else{//data in pre-autoroles format
+            if(!data[server.id].hasOwnProperty("autoroles"))
+            {
+                data[server.id].autoroles = [];
+            }
         }
     }
     return true;
@@ -158,6 +164,30 @@ roleManager.loar = function(message, data)
     return output;
 }
 
+roleManager.laar = function(message, data)
+{
+    if(!assertServerExistance(message.server,data) || data[message.server.id].autoroles.length == 0)
+    {
+        return "I have no auto assigned roles listed for this server.";
+    }
+    var output = "I have the following auto assiged role(s) listed:\n";
+    for(var a = 0; a < data[message.server.id].autoroles.length; a++){
+        if(a!=0) output+=", ";
+        var name = getFromId(message.server,data[message.server.id].autoroles[a])
+        if(name !== undefined){
+             name = name.name;
+            if(name.includes(" ")) name = `"${name}"`;
+            output+=name;
+        }else{
+            data[message.server.id].autoroles.splice(a,1);
+            var logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+            if(logChannel!=undefined)
+                message.client.sendMessage(logChannel,`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
+        }
+    }
+    return output;
+}
+
 roleManager.asar = function(message,role,data)//we need permissions before adding this one.
 {
     var server = message.server;
@@ -256,7 +286,58 @@ roleManager.doar = function(message, role, data)
                 message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of assignable roles.`,{"disableEveryone":true});
             return `Deleted ${role.name} from assignable list.`
         }
-        return "I don't have a mod assignable role named that way."
+        return "I don't have an other assignable role named that way."
+        }
+}
+
+roleManager.aaar = function(message,role,data)
+{
+    var server = message.server;
+    role = getFromName(server,role);
+    assertServerExistance(server,data)
+    if(role==undefined)
+        return "I have not found a role named that way."
+    else{
+        if(data[server.id].autoroles.find(function(x){return x == role.id})!=undefined)
+            return "This role is already in my list!";
+        data[server.id].autoroles.push(role.id);
+        data[server.id].autoroles.sort((x,y) =>
+            {
+                let x_ = server.roles.find(function(z1){return z1.id == x});
+                let y_ = server.roles.find(function(z2){return z2.id == y});
+                return  y_.position-x_.position;
+            })
+        var logChannel = server.channels.find(function(x){return x.name=="logs"});
+        if(logChannel!=undefined)
+            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of automatically assigned roles.`,{"disableEveryone":true});
+        return `"${role.name}" added to the list of automatically assigned roles!`;
+    }
+}
+
+roleManager.daar = function(message,role,data)
+{
+    var server = message.server;
+    role = getFromName(server,role)
+    assertServerExistance(server,data)
+    if(role==undefined)
+        return "I have not found a role named that way."
+    else{
+        if(data[server.id].autoroles.find(function(x){return x == role.id})!=undefined){
+            var index = -1;
+            for(var a = 0; a<data[server.id].autoroles.length; a++)
+            {
+                if(data[server.id].otherroles[a] == role.id){
+                    index = a;
+                    break;
+                }
+            }
+            data[server.id].otherroles.splice(index,1);
+            var logChannel = server.channels.find(function(x){return x.name=="logs"});
+            if(logChannel!=undefined)
+                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of automatically assigned roles.`,{"disableEveryone":true});
+            return `Deleted ${role.name} from automaticaly asssigned roles list.`
+        }
+        return "I don't have an automatically assigned role named that way."
         }
 }
 

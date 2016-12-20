@@ -382,6 +382,43 @@ var commands = {
         },
         permissions: { global: false }
     },
+    "listautoroles" : {
+        name: "listautoroles",
+        usages: [
+            []
+        ],
+        description: "Lists all automatically assigned roles.",
+        process: function(client, message, usage, dataHandlers)
+        {
+            client.sendMessage(message.channel,roleManager.laar(message,dataHandlers.roles.data));
+            return true;
+        },
+        permissions: {global: false}
+    },
+    "aaar": {
+		name: "aaar",
+        usages: [
+            ["role"]
+        ],
+        description: "Adds a role to the list of auto assigned roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.aaar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
+    "daar": {
+		name: "daar",
+        usages: [
+            ["role"]
+        ],
+        description: "Removes a role to the list of auto assigned roles.",
+        process: function (client, message, usage,dataHandlers) {
+            client.sendMessage(message.channel,roleManager.daar(message,usage.parameters["role"], dataHandlers.roles.data));
+            return true;
+        },
+        permissions: { global: false }
+    },
     "blacklist": {
         name: "blacklist",
         usages: [

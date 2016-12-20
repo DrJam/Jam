@@ -138,15 +138,6 @@ client.on("serverNewMember", function (server, user) {
     {
         events["serverNewMember"][i][1](events["serverNewMember"][i][0],client,server,user);
     }
-    try {
-        var role = server.roles.get("name", "Dota");
-        var user = server.members.get("id", user.id);
-    } catch (e) {
-        console.log(e);
-    }
-    client.addMemberToRole(user, role);
-    var logsChannel = server.channels.get("name", "logs");    
-    client.sendMessage(logsChannel, user.name + " joined the server, gave role Dota");
 });
 
 client.on("presence", function (oldUser, newUser) {

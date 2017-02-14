@@ -94,9 +94,9 @@ ModManager.prototype.load = function(filepath){
             failure = true;
             output = {failure:true, err:"Not a valid ModManager module."};
         }
-        if(output.hasOwnProperty("Data") && output.Data != null)
+        if("Data" in output && output.Data != null)
             output.Data = db.collection(output.Data);
-        if(output.hasOwnProperty("Config"))
+        if("Config" in output)
             output.Config.forEach((x)=>{
                 if(config.hasOwnProperty(x.name))
                     x.value = config[x.name];

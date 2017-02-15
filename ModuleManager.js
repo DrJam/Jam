@@ -10,7 +10,7 @@ var ModManager = function(){
 ModManager.prototype.setDatabase = function(database){
     db = database;
 }
-modManagar.prototype.setConfig = function(configuration){
+ModManager.prototype.setConfig = function(configuration){
     config = configuration
 }
 
@@ -22,16 +22,20 @@ var constructReadyParameters = function(mod){
     let output = {};
     mod.Dependencies.forEach((val)=>{
         let push = loaded.find(
-            (x)=>{return x.Name == val;}
+            (x)=>{return x.mod.Name == val;}
         );
         if(push==null)
             push = ready.find(
                 (x)=>{return x.Name == val;}
             )
-        if(push == null && val!="modmanager")
-            throw new Error("Dependency '"+val+"' was not loaded!");
         else
-            push = this;
+            push = push.mod;
+        if(push == null)
+        {    if(val!="modmanager")
+                throw new Error("Dependency '"+val+"' was not loaded!");
+            else
+                push = this;
+        }
         output[val] = push;
     });
     return output;
@@ -61,8 +65,15 @@ ModManager.prototype.load = function(filepath){
     {
         if("Name" in output && "onReady" in output && "Dependencies" in output)
         {
+            if("Data" in output && output.Data != null)
+                output.Data = db.collection(output.Data);
+            if("Config" in output)
+                output.Config.forEach((x)=>{
+                if(config.hasOwnProperty(x.name))
+                            x.value = config[x.name];
+                })
             let dependencies = output.Dependencies.filter((val,index,arr)=>{
-                return !loaded.some((x)=>{return x.Name==val}) 
+                return !loaded.some((x)=>{return x.mod.Name==val}) 
                     && !ready.some((x)=>{return x.Name==val}) 
                     && val!=output.Name
                     && val!="modmanager";   
@@ -74,47 +85,41 @@ ModManager.prototype.load = function(filepath){
                 }
             else
                 {
-                    loaded.forEach((val)=>{
-                        let index =-1;
-                        while((index = val.missing.indexOf(output.Name))!=-1)
-                        {
-                            val.missing.splice(index,1);
-                        }
-                        if(val.missing.length==0){
-                            ready.push(val.mod);
-                            val.mod.onReady(constructReadyParameters(val.obj));
-                        }
-                    });
                     loaded = loaded.filter((val) => {return val.missing.length!=0});
                     loaded.push({mod:output,missing:dependencies});
                 }
+            loaded.forEach((val)=>{
+                let index =-1;
+                while((index = val.missing.indexOf(output.Name))!=-1)
+                {
+                    val.missing.splice(index,1);
+                }
+                if(val.missing.length==0){
+                    ready.push(val.mod);
+                    val.mod.onReady(constructReadyParameters(val.mod));
+                }
+            loaded = loaded.filter((val)=>{return val.missing.length>0});
+            });
         }
         else
         {
             failure = true;
             output = {failure:true, err:"Not a valid ModManager module."};
         }
-        if("Data" in output && output.Data != null)
-            output.Data = db.collection(output.Data);
-        if("Config" in output)
-            output.Config.forEach((x)=>{
-                if(config.hasOwnProperty(x.name))
-                    x.value = config[x.name];
-            })
     }
     return output;
 }
 
 ModManager.prototype.autoResolveAllDependencies = function(){
-    loaded.forEach((val)=>{
-        let missing = val.missing;
-        let mod = val.mod;
+    while(this.unresolvedDependencies()>0){
+        let missing = loaded[0].missing;
+        let mod = loaded[0].mod;
         missing.forEach((x)=>{
             let result = this.load("./modules/"+x+".js");//probably doesn't work because of scoping issues.
             if(result.failure == true)
                 throw new Error("Failure trying to load dependency '"+x+"'");
         })
-    });
+    }
 }
 
 module.exports = new ModManager();

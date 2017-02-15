@@ -41,7 +41,6 @@ Commands.prototype.registerCommand = function(mod, command){
 }
 
 Commands.prototype.onMessage = function(message){
-    isReady = true;
     if( ! (message.content.startsWith(prefix) || message.channel.type=="dm"))
         return;
     console.log(message.author +":"+message.content);

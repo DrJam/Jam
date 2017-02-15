@@ -45,7 +45,7 @@ ModManager.prototype.registerEvents = function(Client){
     ready.forEach((mod)=>{
         if("Events" in mod){
             mod.Events.forEach((eventObject)=>{
-                Client.on(eventObject.type,mod[eventObject.method]);
+                Client.on(eventObject.type,(par1,par2,par3) => {mod[eventObject.method](par1,par2,par3)});
             })
         }
     })

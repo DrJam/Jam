@@ -50,7 +50,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
             process: function (message, usage) {
                 let _output = [];
                 function print(line){_output.push(line);};
-                try{ let res = eval(usage.parameters.expression);}
+                let res;
+                try{ res = eval(usage.parameters.expression);}
                 catch(E){print(`Following error was encountered: ${E.message}`);}
                 if(_output.length>0)
                     message.channel.send(_output.join("\n"));
@@ -59,6 +60,45 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
                 return true;
             },
             permissions: {global: false, restricted: true}
+        }
+    );
+    commands.registerCommand(this,//github
+        {
+            name: "github",
+            words: ["github"],
+            usages: [
+                []
+            ],
+            permissions: {global:true},
+            process: function(message,usage){
+                message.channel.send("Source code: https://github.com/DrJam/Jam");
+            }
+        }
+    );
+    commands.registerCommand(this,//donate
+        {
+            name: "donate",
+            words: ["donate", "paypal"],
+            usages: [
+                []
+            ],
+            permissions: {global:true},
+            process: function(message,usage){
+                message.channel.send("Donate towards bot upkeep here: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4XCZN4NU3A94L");
+            }
+        }
+    );
+    commands.registerCommand(this,//info
+        {
+            name: "info",
+            words: ["info", "jam"],
+            usages: [
+                []
+            ],
+            permissions: {global:true},
+            process: function(message,usage){
+                message.channel.send("Hey, I am Jam.\nA Discord bot written in JavaScript.\nRight now I'm not publicly accessible, but you can host your own version of me by grabbing my source code from my github!");
+            }
         }
     );
 }   

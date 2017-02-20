@@ -1,1 +1,1 @@
-Licence: if you can make it work you can use it.
+License: look at the license file

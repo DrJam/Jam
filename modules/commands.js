@@ -11,7 +11,6 @@ Commands.prototype.onReady = function(pars){
     isReady = true;
     permissions = pars.permissions;
     prefix = this.Config[0].value;
-    commands.forEach((x)=>permissions.assertCommand(x));
 }
 
 var permissions;
@@ -36,31 +35,44 @@ Commands.prototype.registerCommand = function(mod, command){
 
         return (a.mod.Name < b.mod.Name)? -1: 1;
     });
-    if(isReady)
-        permissions.assertCommand(command);
 }
 
 Commands.prototype.onMessage = function(message){
     if( ! (message.content.startsWith(prefix) || message.channel.type=="dm"))
         return;
+    let dm = (message.channel.type=="dm")? 1 : 0;
+    dm = (message.channel.type=="group") ? 2: dm;
     console.log(message.author +":"+message.content);
     let text = message.content;
-    if(message.channel.type!="dm" || text.startsWith(prefix))
+    if(dm!=1 || text.startsWith(prefix))
          text = text.slice(prefix.length);
     let wordOfCommand = text.split(" ",1)[0];
-    let command = commands.find((com)=>{return com.words.some((word)=>{return word == wordOfCommand})});
+    let command = commands.find((com)=>{return com.words.some((word)=>{return (word == wordOfCommand && ((dm>0 && "allowPrivate" in command && command.allowPrivate) || dm==0))})});
     if(command==null)
+    {
+        if(dm == 1)//only send a message if we are dm'ing.
+            message.channel.send("I'm sorry, I don't have any command like that available for direct messages.")
+        return;
+    }
+    
+    message.channel.startTyping();
+    permissions.checkPermissionsAsync(message,command).then(
+        (val)=>
         {
-            if(message.channel.type == "dm")
-                message.channel.send("I'm sorry, I don't have any command like that.")
-            return;
+            message.channel.stopTyping();
+            if(val === false)
+                message.channel.send("sorry, ur not cool enough for that command");
+            if(val === true)
+                tryToExecuteCommand(message,text,wordOfCommand,command);
+            if(val === "ERROR")
+                message.channel.send("Something went wrong, sorry about that.");
+            //technically, we could receive "IGNORED", in which case we do nothing. So no checks required.
         }
-    if(!permissions.checkPermissions(message.author,command))
-        {
-            message.channel.send("sorry, ur not cool enough for that command");
-            return;
-        
-        }
+    ).catch(()=>{message.channel.stopTyping()})//if we somehow reach this (which should be impossible), better stop typing.
+}
+
+var tryToExecuteCommand = function(message,text,wordOfCommand,command)//Worry not about the permissions.
+{
     text = text.split(" ").splice(1).join(" ");//everything after the first word.
     let params = getParams(text, command.usages);
     if(params === null)

@@ -15,7 +15,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
                 message.reply("pong!");
                 return true;
             },
-            permissions: { global: true }
+            permissions: { global: true },
+            allowPrivate: true
         }
     );
     commands.registerCommand(this,//playing
@@ -28,15 +29,16 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
             description: "Sets the bot's playing status",
             process: function (message, usage) {
                 if (usage.parameters.status.length > 0) {
-                    message.client.setPlayingGame(usage.parameters.status);
+                    message.client.user.setGame(usage.parameters.status);
                     message.channel.send("Playing status set to `" + usage.parameters.status + "`");
                 } else {
-                    message.client.setPlayingGame(null);
+                    message.client.user.setGame(null);
                     message.channel.send("Playing status cleared");
                 }
                 return true;
             },
-            permissions: { global: false, restricted : true }
+            permissions: { global: false, restricted : true },
+            allowPrivate: true
         }
     );
     commands.registerCommand(this,//eval
@@ -59,7 +61,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
                     message.channel.send(res);
                 return true;
             },
-            permissions: {global: false, restricted: true}
+            permissions: {global: false, restricted: true},
+            allowPrivate: true
         }
     );
     commands.registerCommand(this,//github
@@ -72,7 +75,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
             permissions: {global:true},
             process: function(message,usage){
                 message.channel.send("Source code: https://github.com/DrJam/Jam");
-            }
+            },
+            allowPrivate: true
         }
     );
     commands.registerCommand(this,//donate
@@ -85,7 +89,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
             permissions: {global:true},
             process: function(message,usage){
                 message.channel.send("Donate towards bot upkeep here: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4XCZN4NU3A94L");
-            }
+            },
+            allowPrivate: true
         }
     );
     commands.registerCommand(this,//info
@@ -98,7 +103,8 @@ dumbCommands.prototype.onReady = function(pars){//The real constructor.
             permissions: {global:true},
             process: function(message,usage){
                 message.channel.send("Hey, I am Jam.\nA Discord bot written in JavaScript.\nRight now I'm not publicly accessible, but you can host your own version of me by grabbing my source code from my github!");
-            }
+            },
+            allowPrivate: true
         }
     );
 }   

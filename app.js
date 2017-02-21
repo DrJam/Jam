@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const config = require("./config/config.json");
 const assert = require("assert");
-var Client = new Discord.Client({disableEveryone:true,disabledEvents:["TYPING_START"]});
+var Client = new Discord.Client({disableEveryone:true,disabledEvents:["TYPING_START"]});//this particular event causes a lot of overhead and we don't do anything with it.
 Client.token = config.token;
 var MongoClient = require("mongodb").MongoClient;
 var ModuleManager = require("./ModuleManager.js");

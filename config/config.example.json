@@ -1,16 +1,8 @@
 ﻿{
-    "prefix": ",",
+    "prefix": ".",
     "ownerids": [
-        116812471628464132,
-        98460699696574464
+        
     ],
-	"token" : "",
-    "status" : "Try ,help!",
-    "database" : "mongodb://localhost:27017/jam",
-    "modules" : [
-        "commands",
-        "permissions",
-        "userdata",
-        "rolemanager"
-    ]
+    "saveInterval": 5,
+    "status" : ""
 }

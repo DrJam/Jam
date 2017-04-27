@@ -1,0 +1,15 @@
+{
+    //character(s) before a command, e.g. "." -> ".ping"
+    "commandPrefix": ".",
+    "ownerIds": [
+        //your ids here as numbers
+    ],
+    "status" : "default status",
+    "database" : "mongodb://xxx.xxx.xxx.xxx:xxxxx/xxx",
+    "modules" : [
+        "commands",
+        "permissions",
+        "userdata",
+        "rolemanager"
+    ]
+}

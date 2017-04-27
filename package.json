@@ -25,7 +25,9 @@
     "discord.js": "^11.0.0",
     "mongodb": "^2.2.26"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^7.0.14"
+  },
   "private": true,
   "license": "MIT"
 }

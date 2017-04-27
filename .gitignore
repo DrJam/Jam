@@ -245,5 +245,5 @@ ModelManifest.xml
 .fake/
 
 #private stuff
-auth.json
-config.json
+config/config.json
+config/auth.json

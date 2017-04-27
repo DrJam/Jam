@@ -1,6 +1,6 @@
 class Config {
     commandPrefix: string
-    ownerids: Array<number>
+    ownerIds: Array<number>
     status: string
     database: string
     modules: Array<string>

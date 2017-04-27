@@ -3,7 +3,7 @@ class Config {
     ownerIds: Array<number>
     status: string
     database: string
-    modules: Array<string>
+    enabledPlugins: Array<string>
 }
 
 export = Config;

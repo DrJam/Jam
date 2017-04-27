@@ -6,7 +6,7 @@
     ],
     "status" : "default status",
     "database" : "mongodb://xxx.xxx.xxx.xxx:xxxxx/xxx",
-    "modules" : [
+    "enabledPlugins" : [
         "commands",
         "permissions",
         "userdata",

@@ -53,8 +53,8 @@ permissions.hasPermissions = function(mod,server,author, command){
 permissions.ready = function(mod, client)
 {
     if(mod.data != undefined){
-        for(var a =0; a< client.servers.length; a++){
-            mod.assertExistence(client.servers[a]);
+        for(var a =0; a< client.guilds.array().length; a++){
+            mod.assertExistence(client.guilds.array()[a]);
         }
     }
 }

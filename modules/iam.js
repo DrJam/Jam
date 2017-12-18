@@ -41,7 +41,7 @@ function assertServerExistance(server, data)//returns true if server existed in 
 
 roleManager.iam = function(message, role, data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     if(role == undefined)
         return false;
@@ -49,7 +49,7 @@ roleManager.iam = function(message, role, data)
         message.author.addTo(role);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
+            logChannel.sendMessage(,`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
         return true;
     }else
         return false;
@@ -57,7 +57,7 @@ roleManager.iam = function(message, role, data)
 
 roleManager.iamnot = function(message,role,data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
@@ -66,7 +66,7 @@ roleManager.iamnot = function(message,role,data)
             message.author.removeFrom(role);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`Removed ${role.name} from ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
+                logChannel.sendMessage(`Removed ${role.name} from ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
             return {"value":true, "message":"Role succesfully removed!"};
             
         }else{
@@ -78,7 +78,7 @@ roleManager.iamnot = function(message,role,data)
 
 roleManager.theyam = function(message, role, target, data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     if(role == undefined)
         return false;
@@ -86,7 +86,7 @@ roleManager.theyam = function(message, role, target, data)
        target.addTo(role);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`Assigned ${role.name} to ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
+            logChannel.sendMessage(`Assigned ${role.name} to ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
         return true;
     }else
         return false;
@@ -94,7 +94,7 @@ roleManager.theyam = function(message, role, target, data)
 
 roleManager.theyamnot = function(message,role,target,data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
@@ -103,7 +103,7 @@ roleManager.theyamnot = function(message,role,target,data)
             target.removeFrom(role);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`Removed ${role.name} from ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
+                logChannel.sendMessage(`Removed ${role.name} from ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
             return {"value":true, "message":`Role succesfully removed from ${target.username}#${target.discriminator}!`};
             
         }else{
@@ -115,23 +115,23 @@ roleManager.theyamnot = function(message,role,target,data)
 
 roleManager.lsar = function(message, data)
 {
-    if(!assertServerExistance(message.server,data) || data[message.server.id].selfroles.length == 0)
+    if(!assertServerExistance(message.guild,data) || data[message.guild.id].selfroles.length == 0)
     {
         return "I have no self assignable roles listed for this server.";
     }
     var output = "I have the following self assignable roles listed:\n";
-    for(var a = 0; a < data[message.server.id].selfroles.length; a++){
+    for(var a = 0; a < data[message.guild.id].selfroles.length; a++){
         if(a!=0) output+=", ";
-        var name = getFromId(message.server,data[message.server.id].selfroles[a])
+        var name = getFromId(message.guild,data[message.guild.id].selfroles[a])
         if(name !== undefined){
              name = name.name;
             if(name.includes(" ")) name = `"${name}"`;
             output+=name;
         }else{
-            data[message.server.id].selfroles.splice(a,1);
-            var logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+            data[message.guild.id].selfroles.splice(a,1);
+            var logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
+                logChannel.sendMessage(`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
         }
     }
     return output;
@@ -139,26 +139,26 @@ roleManager.lsar = function(message, data)
 
 roleManager.loar = function(message, data)
 {
-    if(!assertServerExistance(message.server,data) || data[message.server.id].otherroles.length == 0)
+    if(!assertServerExistance(message.guild,data) || data[message.guild.id].otherroles.length == 0)
     {
-        if(data[message.server.id].selfroles.length == 0)
+        if(data[message.guild.id].selfroles.length == 0)
             return "I have no assignable roles listed for this server.";
         else
             return "I have no assignable roles listed, but you could assign self-assignable roles."
     }
     var output = "I have the following assignable roles listed:\n";
-    for(var a = 0; a < data[message.server.id].otherroles.length; a++){
+    for(var a = 0; a < data[message.guild.id].otherroles.length; a++){
         if(a!=0) output+=", ";
-        var name = getFromId(message.server,data[message.server.id].otherroles[a])
+        var name = getFromId(message.guild,data[message.guild.id].otherroles[a])
         if(name !== undefined){
              name = name.name;
             if(name.includes(" ")) name = `"${name}"`;
             output+=name;
         }else{
-            data[message.server.id].otherroles.splice(a,1);
-            var logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+            data[message.guild.id].otherroles.splice(a,1);
+            var logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
+                logChannel.sendMessage(`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
         }
     }
     return output;
@@ -166,23 +166,23 @@ roleManager.loar = function(message, data)
 
 roleManager.laar = function(message, data)
 {
-    if(!assertServerExistance(message.server,data) || data[message.server.id].autoroles.length == 0)
+    if(!assertServerExistance(message.guild,data) || data[message.guild.id].autoroles.length == 0)
     {
         return "I have no auto assigned roles listed for this server.";
     }
     var output = "I have the following auto assiged role(s) listed:\n";
-    for(var a = 0; a < data[message.server.id].autoroles.length; a++){
+    for(var a = 0; a < data[message.guild.id].autoroles.length; a++){
         if(a!=0) output+=", ";
-        var name = getFromId(message.server,data[message.server.id].autoroles[a])
+        var name = getFromId(message.guild,data[message.guild.id].autoroles[a])
         if(name !== undefined){
              name = name.name;
             if(name.includes(" ")) name = `"${name}"`;
             output+=name;
         }else{
-            data[message.server.id].autoroles.splice(a,1);
-            var logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+            data[message.guild.id].autoroles.splice(a,1);
+            var logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
+                logChannel.sendMessage(`When I was listing roles, I discovered a role was missing. Deleted it.`,{"disableEveryone":true});
         }
     }
     return output;
@@ -190,7 +190,7 @@ roleManager.laar = function(message, data)
 
 roleManager.asar = function(message,role,data)//we need permissions before adding this one.
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     assertServerExistance(server,data)
     if(role==undefined)
@@ -207,14 +207,14 @@ roleManager.asar = function(message,role,data)//we need permissions before addin
             })
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of self assignable roles.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of self assignable roles.`,{"disableEveryone":true});
         return `"${role.name}" added to the list of self assignable roles!`;
     }
 }
 
 roleManager.aoar = function(message,role,data)//we need permissions before adding this one.
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     assertServerExistance(server,data)
     if(role==undefined)
@@ -231,14 +231,14 @@ roleManager.aoar = function(message,role,data)//we need permissions before addin
             })
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of assignable roles.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of assignable roles.`,{"disableEveryone":true});
         return `"${role.name}" added to the list of assignable roles!`;
     }
 }
 
 roleManager.dsar = function(message, role, data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role)
     assertServerExistance(server,data)
     if(role==undefined)
@@ -256,7 +256,7 @@ roleManager.dsar = function(message, role, data)
             data[server.id].selfroles.splice(index,1);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of self assignable roles.`,{"disableEveryone":true});
+                logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of self assignable roles.`,{"disableEveryone":true});
             return `Deleted ${role.name} from self assignable list.`
         }
         return "I don't have a self assignable role named that way."
@@ -265,7 +265,7 @@ roleManager.dsar = function(message, role, data)
 
 roleManager.doar = function(message, role, data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role)
     assertServerExistance(server,data)
     if(role==undefined)
@@ -283,7 +283,7 @@ roleManager.doar = function(message, role, data)
             data[server.id].otherroles.splice(index,1);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of assignable roles.`,{"disableEveryone":true});
+                logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of assignable roles.`,{"disableEveryone":true});
             return `Deleted ${role.name} from assignable list.`
         }
         return "I don't have an other assignable role named that way."
@@ -292,7 +292,7 @@ roleManager.doar = function(message, role, data)
 
 roleManager.aaar = function(message,role,data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role);
     assertServerExistance(server,data)
     if(role==undefined)
@@ -309,14 +309,14 @@ roleManager.aaar = function(message,role,data)
             })
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of automatically assigned roles.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of automatically assigned roles.`,{"disableEveryone":true});
         return `"${role.name}" added to the list of automatically assigned roles!`;
     }
 }
 
 roleManager.daar = function(message,role,data)
 {
-    var server = message.server;
+    var server = message.guild;
     role = getFromName(server,role)
     assertServerExistance(server,data)
     if(role==undefined)
@@ -334,7 +334,7 @@ roleManager.daar = function(message,role,data)
             data[server.id].otherroles.splice(index,1);
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
-                message.client.sendMessage(logChannel,`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of automatically assigned roles.`,{"disableEveryone":true});
+                logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of automatically assigned roles.`,{"disableEveryone":true});
             return `Deleted ${role.name} from automaticaly asssigned roles list.`
         }
         return "I don't have an automatically assigned role named that way."

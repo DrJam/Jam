@@ -62,12 +62,12 @@ var clientConfig = { autoReconnect: true };
 var client = new Discord.Client(clientConfig);
 
 client.on("ready", function() {
-    console.log("Ready. Serving " + client.channels.length + " channels.");
+    console.log("Ready. Serving " + client.guilds.length + " serbers.");
     setInterval(saveIntervalElapsed, 1000 * 60 * config.saveInterval);
     if(config.status != undefined)
-        client.setPlayingGame(config.status);
+        client.user.setPresence({game:{name:config.status}}).then(null,null);
     else
-        client.setPlayingGame("config.status is undefined!");
+        client.user.setPresence({game:{name:"config.status is undefined!"}}).then(null,null);
     for(var i in events["ready"])
     {
         events["ready"][i][1](events["ready"][i][0],client);
@@ -83,7 +83,7 @@ client.on("disconnected", function() {
 });
 
 client.on("message", function(message) {
-    if(message.server == undefined)//we do not handle private messages!
+    if(message.guild == undefined)//we do not handle private messages! (Yet)
         return;
     for(var i in events["message"])
     {
@@ -109,11 +109,11 @@ client.on("message", function(message) {
         return;
 
     console.log();
-    console.log(message.server.name + " | #" + message.channel.name + " | " 
-        + message.author.name + "#" + message.author.discriminator + ":" + message.content);
+    console.log(message.guild.name + " | #" + message.channel.name + " | " 
+        + message.author.username + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
-    if(permissions.hasPermissions(permissions, message.server, message.author,commandObj)){
+    if(permissions.hasPermissions(permissions, message.guild, message.author,commandObj)){
         var usage = params.getParams(suffix, commandObj.usages);
         if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
             console.log("Incorrect usage");
@@ -125,11 +125,11 @@ client.on("message", function(message) {
                 }
             }
             output += "```";
-            client.sendMessage(message.channel, output);
+            message.channel.sendMessage(output);
             return;
         }
     }else{//no permissions.
-        client.sendMessage(message.channel, "sorry, ur not cool enough for that command");
+        message.channel.sendMessage("sorry, ur not cool enough for that command");
     }
 });
 
@@ -294,4 +294,4 @@ client.on("userUnbanned",function(user,server){
 
 //end boring code
 
-client.loginWithToken(auth.token);
+client.login(auth.token);

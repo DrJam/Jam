@@ -6,15 +6,15 @@ permissions.addRole = function(mod, message,command,role,data)
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message":  "That command does not exist, or does not allow permissions modifying!"};
 
-    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    role = message.guild.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
     if(role ==undefined)
         return {"value": true , "message" : "That role does not exist!"};
 
-    data[message.server.id][command].roles.push(role.id);
+    data[message.guild.id][command].roles.push(role.id);
 
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        if(data[message.server.id][command].blacklist)
+        if(data[message.guild.id][command].blacklist)
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made ${role.name} role NO LONGER allowed to use ${command}.`,{"disableEveryone":true});
         else
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made all roles above and including ${role.name} now allowed to use ${command}.`,{"disableEveryone":true});
@@ -28,19 +28,19 @@ permissions.deleteRole =  function (mod, message, command, role, data)
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message":  "That command does not exist, or does not allow permissions modifying!"};
 
-    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    role = message.guild.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
     if(role == undefined)
         return {"value": true, "message":"Role does not exist in server."};
 
-    var index = data[message.server.id][command].roles.indexOf(role.id);    
+    var index = data[message.guild.id][command].roles.indexOf(role.id);    
     if( index == -1)
         return {"value": true, "message" : "That role does not have any special permissions for this command."};
     
-    data[message.server.id][command].roles.splice(index,1);
+    data[message.guild.id][command].roles.splice(index,1);
 
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        if(data[message.server.id][command].blacklist)
+        if(data[message.guild.id][command].blacklist)
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`,{"disableEveryone":true});
         else
             message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`,{"disableEveryone":true});
@@ -63,13 +63,13 @@ permissions.addUser =  function(mod, message,command,value,data)
         return {"value": true, "message": `Please use "true", "allow", "deny" or "false"! I'm not THAT smart.`};
 
     var output = "";
-    if(data[message.server.id][command].users[user.id] == undefined)
+    if(data[message.guild.id][command].users[user.id] == undefined)
         output = "Explicit user permissions added!";
     else
         output = "Explicit user permissions overwritten!";    
-    data[message.server.id][command].users[user.id] = (value == "true"|| value == "allow");
+    data[message.guild.id][command].users[user.id] = (value == "true"|| value == "allow");
 
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} added explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} which were set to "${value}"`);
     return {"value": true, "message": output}; 
@@ -85,14 +85,14 @@ permissions.deleteUser = function(mod, message,command,data)
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message": "That command does not exist, or does not allow permissions modifying!"};
     
-    if(data[message.server.id][command].users[user.id] == undefined)
+    if(data[message.guild.id][command].users[user.id] == undefined)
         return {"value": true, "message": "This user does not have any associated permissions for this command."}
     
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} removed explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} `);
+        logChannel.sendMessage(`${message.author.name}#${message.author.discriminator} removed explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} `);
 
-    delete data[message.server.id][command].users[user.id];
+    delete data[message.guild.id][command].users[user.id];
     return {"value": true, "message": "Associated permissions for this user are now forgotten."};
 
 }
@@ -108,13 +108,13 @@ permissions.blacklist = function(mod, message, command, value, data)
     value = (value === "true");
 
     var listType = (value) ? "blacklist" : "whitelist";
-    if(data[message.server.id][command].blacklist == value)
+    if(data[message.guild.id][command].blacklist == value)
             return {"value": true, "message": `This command is already a ${listType}.`}
     
-    data[message.server.id][command].blacklist = value;
-    data[message.server.id][command]. roles = [];
+    data[message.guild.id][command].blacklist = value;
+    data[message.guild.id][command]. roles = [];
 
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} switched ${command} to a ${listType}. All associated role permissions have been wiped.`,{"disableEveryone":true});
 
@@ -126,7 +126,8 @@ permissions.getBlacklist = function(mod, message, command, data)
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message": "That command does not exist, or does not allow permissions modifying!"};
     
-    var listType = (data[message.server.id][command].blacklist) ? "blacklist" : "whitelist";
+
+    var listType = (data[message.guild.id][command].blacklist) ? "blacklist" : "whitelist";
     output = `This command uses a ${listType}. This means that if a user has a listed role, `;
     if(listType == "blacklist")
         output += "they will **not** be allowed to use this command." ;
@@ -137,11 +138,11 @@ permissions.getBlacklist = function(mod, message, command, data)
 
 permissions.addIgnoredRole = function(mod, message, role, data)
 {
-    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    role = message.guild.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
     if(role ==undefined)
         return {"value": true , "message" : "That role does not exist!"};
 
-    server = message.server;
+    server = message.guild;
 
     if(data[server.id]._ignoredRoles.find(function(x){return x == role.id}) != undefined)
         return {"value": true , "message" : "That role is already ignored!"};
@@ -157,11 +158,11 @@ permissions.addIgnoredRole = function(mod, message, role, data)
 
 permissions.removeIgnoredRole = function(mod,message, role, data){
 
-    role = message.server.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
+    role = message.guild.roles.find(function(x){return x.name.toLowerCase() == role.toLowerCase()})
     if(role ==undefined)
         return {"value": true , "message" : "That role does not exist!"};
 
-    server = message.server;
+    server = message.guild;
 
     var id = data[server.id]._ignoredRoles.find(function(x){return x == role.id});
     if(id == undefined)
@@ -177,7 +178,7 @@ permissions.removeIgnoredRole = function(mod,message, role, data){
 }
 
 permissions.listIgnoredRoles = function(message,data){
-    server = message.server;
+    server = message.guild;
     var outputList = [];
     for(var a = 0; a<data[server.id]._ignoredRoles.length;a++)
     {
@@ -206,9 +207,9 @@ permissions.reset = function(mod, message, command, data)
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message": `That command does not exist or does not allow permissions modifying!`};
     
-    data[message.server.id][command] =  {"blacklist": mod.commands[command].permissions.global,"roles":[],"users":{}};
+    data[message.guild.id][command] =  {"blacklist": mod.commands[command].permissions.global,"roles":[],"users":{}};
     
-    logChannel = message.server.channels.find(function(x){return x.name=="logs"});
+    logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} reset the permissions for ${command}`,{"disableEveryone":true});
 
@@ -224,11 +225,11 @@ permissions.list = function(mod, message, command, data)
     if(mod.commands[command].permissions.restricted){
         output+=`Bot-Owner only.`;
     }else{
-        var perms = data[message.server.id][command];
+        var perms = data[message.guild.id][command];
         output+= `Blacklist: ${perms.blacklist}\n`;
         output+= `Roles:`;
             for(var a =0; a<perms.roles.length;a++){
-                var r = message.server.roles.find(function(x){return x.id == perms.roles[a]})
+                var r = message.guild.roles.find(function(x){return x.id == perms.roles[a]})
                 if(r!=undefined)
                     output+= " "+r.name;   
             }
@@ -236,9 +237,9 @@ permissions.list = function(mod, message, command, data)
         output+= "Users:";
         var output2 = "";
         for(var userId in perms.users){
-            if(message.server.members.get("id",userId)!=null)
+            if(message.guild.members.get("id",userId)!=null)
             {
-                var userStuff = message.server.members.get("id",userId)
+                var userStuff = message.guild.members.get("id",userId)
                 output2+= `${userStuff.name}#${userStuff.discriminator}`;  
             }else{
                 output2+= userid;
@@ -256,7 +257,7 @@ permissions.list = function(mod, message, command, data)
 permissions.help = function(mod, message, data)
 {
     var returnal = [];
-    var perms = data[message.server.id];
+    var perms = data[message.guild.id];
     if(mod.config.ownerids.find(function(x){return x==message.author.id})!=undefined)//check for botowner
     {
         for(var comm in mod.commands)
@@ -266,7 +267,7 @@ permissions.help = function(mod, message, data)
         }
         return returnal;
     }
-    if(message.server.owner.id == message.author.id){//check for server owner
+    if(message.guild.owner.id == message.author.id){//check for server owner
         for(var comm in mod.commands)
         {
             var command = mod.commands[comm];
@@ -277,7 +278,7 @@ permissions.help = function(mod, message, data)
     }
 
     //No (server/bot) owner.
-    var authorRoles = message.server.rolesOfUser(message.author);
+    var authorRoles = message.guild.rolesOfUser(message.author);
     var permLevel = 0;
     for(var r in authorRoles)//Get highest role.
     {
@@ -310,7 +311,7 @@ permissions.help = function(mod, message, data)
             }else{//We are using a whitelist.
                 var hasPerms = false;
                 for(var a = 0; a < perms[command.name].roles.length;a++){
-                    r = message.server.roles.find(function(x){return x.id == perms[command.name].roles[a]});
+                    r = message.guild.roles.find(function(x){return x.id == perms[command.name].roles[a]});
                     if(r!= undefined && permLevel>=r.position){
                         returnal.push(command.name);
                         hasPerms = true;

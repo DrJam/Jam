@@ -18,6 +18,22 @@ var prefix;
 var commands;
 var isReady;
 
+
+/* Documentation on registerCommand
+    command in form of:
+    {
+        name: "name" //Primary command name that will appear in help, permissions, etc.
+        words: [name,alias1,alias2] //Aliases to also listen for.
+        usages: [ //array of allowed usages.
+            [] //not caring about any parameters.
+            ["par1",etc], //You can name parameters how you want, but be aware that the last parameter contains the remainder of the message.
+        ], 
+        description: "help" //As it would appear in help.
+        process: function(message,parameterObject) //either an anonymous function, which will be executed from commands scope, or a reference to another function, which will be executed from the scope of the supplied mod. The parameterObject is described below, at getParams.
+        async: true/false //Optional:if this command will call message.channel.stoptyping by itself. 
+        permissions: {global:true/false (,restricted:true)} //The restricted attribute is optional and assumed false if nonexistent.
+        allowPrivate: true/false
+    }*/
 Commands.prototype.registerCommand = function(mod, command){
     if(typeof command.process == "function")
         command.mod = null;
@@ -37,6 +53,31 @@ Commands.prototype.registerCommand = function(mod, command){
     });
 }
 
+/* getCommmandByString 
+    Returns a list of commands that match a searchstring. If allowpartial is on, and a  true match is found, the trueMatch is returned. (as a list)*/
+Commands.prototype.getCommandByString = function(searchstring, allowPartial){
+    searchstring = searchstring.toLowerCase();
+    if(allowPartial!==true)
+        allowPartial = false;
+    let returnal = commands.filter((command)=>{
+        if( command.words.find((word)=>{
+            let a = word.toLowerCase();
+            if(a.startsWith(searchstring) && (allowPartial||searchstring.length == a.length))
+                return true;
+        }) != null)
+            return true;
+        return false;
+    })
+    if(allowPartial)
+    {
+        let trueMatch = returnal.find((val)=>{return val.words.some((val2)=>{return val2 == searchstring})})
+        if(trueMatch!=null)
+            return [trueMatch];    
+    }
+    return returnal;
+}
+
+/* The actual event handler */
 Commands.prototype.onMessage = function(message){
     if( ! (message.content.startsWith(prefix) || message.channel.type=="dm"))
         return;
@@ -47,7 +88,26 @@ Commands.prototype.onMessage = function(message){
     if(dm!=1 || text.startsWith(prefix))
          text = text.slice(prefix.length);
     let wordOfCommand = text.split(" ",1)[0];
-    let command = commands.find((com)=>{return com.words.some((word)=>{return (word == wordOfCommand && ((dm>0 && "allowPrivate" in command && command.allowPrivate) || dm==0))})});
+    let command = commands.find(
+        (com)=>{
+            return com.words.some((word)=>{
+                return (
+                    word == wordOfCommand 
+                    && 
+                    (
+                        (
+                            dm>0 
+                            &&
+                             "allowPrivate" in command
+                            && 
+                            command.allowPrivate
+                        )
+                        ||
+                        dm==0
+                    )
+                )
+            })
+        });
     if(command==null)
     {
         if(dm == 1)//only send a message if we are dm'ing.
@@ -59,20 +119,24 @@ Commands.prototype.onMessage = function(message){
     permissions.checkPermissionsAsync(message,command).then(
         (val)=>
         {
-            message.channel.stopTyping();
+            
             if(val === false)
                 message.channel.send("sorry, ur not cool enough for that command");
-            if(val === true)
-                tryToExecuteCommand(message,text,wordOfCommand,command);
             if(val === "ERROR")
                 message.channel.send("Something went wrong, sorry about that.");
+            if(! ("async" in command && command.async))
+                message.channel.stopTyping();
+            if(val === true)
+                tryToExecuteCommand(message,text,wordOfCommand,command);
+            
             //technically, we could receive "IGNORED", in which case we do nothing. So no checks required.
         }
-    ).catch(()=>{message.channel.stopTyping()})//if we somehow reach this (which should be impossible), better stop typing.
+    ).catch((err)=>{
+        console.log("ERROR:"+err);
+        message.channel.stopTyping()})//if we somehow reach this (which should be impossible), better stop typing.
 }
 
-var tryToExecuteCommand = function(message,text,wordOfCommand,command)//Worry not about the permissions.
-{
+var tryToExecuteCommand = function(message,text,wordOfCommand,command){//Worry not about the permissions.
     text = text.split(" ").splice(1).join(" ");//everything after the first word.
     let params = getParams(text, command.usages);
     if(params === null)
@@ -80,6 +144,8 @@ var tryToExecuteCommand = function(message,text,wordOfCommand,command)//Worry no
         let output = `Incorrect usage. Below is ${(command.usages.length>1)? "a list of supported usage":"the supported usage" }  or try \`${prefix}help ${wordOfCommand}\`\n`+ "```";
         command.usages.foreach((val)=>{output+=prefix + wordOfCommand+ " <"+val.join("> <")+">\n"})
         message.channel.send(output);
+        if("async" in command && command.async)
+            message.channel.stopTyping();
         return;
     }
     if(command.mod == null)
@@ -89,6 +155,12 @@ var tryToExecuteCommand = function(message,text,wordOfCommand,command)//Worry no
 }
 
 var paramRegex = /"([^"]*?)"|'([^']*?)'|([\S]+)/g;
+/* parameterObject
+ Returns a parameterObject that looks like:
+ {
+    usageid: int, // The usage index as defined by the commands usages.
+    parameters: {par1:val,par2:val2, etc} //an object where par1, par2,etc are the names of the parameters according to defined usage.
+ }     */
 var getParams = function (suffix, usages) {
 	let paramsArray = getParamsArray(suffix);
     return mapParams(paramsArray, usages);

@@ -18,8 +18,10 @@ ModManager.prototype.unresolvedDependencies = function(){
     return loaded.length;
 }
 
+
+//Constructs the requested modules by the mod in the form of [mod0,mod1,mod2,etc];
 var constructReadyParameters = function(mod){
-    let output = {};
+    let output = {_you:mod};
     mod.Dependencies.forEach((val)=>{
         let push = loaded.find(
             (x)=>{return x.mod.Name == val;}
@@ -45,7 +47,7 @@ ModManager.prototype.registerEvents = function(Client){
     ready.forEach((mod)=>{
         if("Events" in mod){
             mod.Events.forEach((eventObject)=>{
-                Client.on(eventObject.type,(par1,par2,par3) => {mod[eventObject.method](par1,par2,par3)});
+                    Client.on(eventObject.type,(par1,par2,par3) => {mod[eventObject.method](par1,par2,par3)});
             })
         }
     })

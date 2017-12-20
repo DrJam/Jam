@@ -35,7 +35,7 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
-var emoji = loadModule("./modules/emoji.js");
+//var emoji = loadModule("./modules/emoji.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
 

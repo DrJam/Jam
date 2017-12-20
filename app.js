@@ -21,6 +21,7 @@
 }
 
 function saveIntervalElapsed(){
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] FH: Saving data.`)
     for (var key in dataHandlers) {
         dataHandlers[key].save();
     }
@@ -62,7 +63,7 @@ var clientConfig = { autoReconnect: true };
 var client = new Discord.Client(clientConfig);
 
 client.on("ready", function() {
-    console.log("Ready. Serving " + client.guilds.length + " serbers.");
+    console.log("Ready. Serving " + client.guilds.array().length + " serbers.");
     setInterval(saveIntervalElapsed, 1000 * 60 * config.saveInterval);
     if(config.status != undefined)
         client.user.setPresence({game:{name:config.status}}).then(null,null);
@@ -75,7 +76,7 @@ client.on("ready", function() {
 });
 
 client.on("disconnected", function() {
-    console.log("Disconnected!");
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] Disconnected!`);
         for(var i in events["disconnected"])
     {
         events["disconnected"][i][1](events["disconnected"][i][0],client);
@@ -108,8 +109,7 @@ client.on("message", function(message) {
     if (!commands.hasOwnProperty(prefix)) 
         return;
 
-    console.log();
-    console.log(message.guild.name + " | #" + message.channel.name + " | " 
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] COMMAND: `+message.guild.name + " | #" + message.channel.name + " | " 
         + message.author.username + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
@@ -140,7 +140,7 @@ client.on("serverNewMember", function (server, user) {
     }
 });
 
-client.on("presence", function (oldUser, newUser) {
+client.on("presenceUpdate", function (oldUser, newUser) {
     for(var i in events["presence"])
     {
         events["presence"][i][1](events["presence"][i][0],client,oldUser,newUser);
@@ -154,21 +154,20 @@ client.on("debug", function(message){
     {
         events["debug"][i][1](events["debug"][i][0],client,message);
     }
-    console.log(`[debug] ${message}`);
 });
 client.on("warn", function(message){
     for(var i in events["warn"])
     {
         events["warn"][i][1](events["warn"][i][0],client,message);
     }
-    console.log(`[warn] ${message}`);
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] WARN: ${message}`);
 });
 client.on("error", function(message){
     for(var i in events["error"])
     {
         events["error"][i][1](events["error"][i][0],client,message);
     }
-    console.log(`[error] ${message}`);
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] ERROR: ${message}`);
 });
 
 client.on("serverCreated", function(server) {
@@ -176,7 +175,7 @@ client.on("serverCreated", function(server) {
     {
         events["serverCreated"][i][1](events["serverCreated"][i][0],client,server);
     }
-    console.log(`[serverCreated] ${server.name}`);;
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] SERVER CREATED: ${server.name}`);;
 });
 
 client.on("serverDeleted", function(server) {
@@ -184,7 +183,6 @@ client.on("serverDeleted", function(server) {
     {
         events["warn"][i][1](events["warn"][i][0],client,server);
     }
-    console.log(`[warn] ${server.name}`);
 });
 
 client.on("messageDeleted",function (message, channel) {

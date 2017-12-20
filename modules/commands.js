@@ -22,7 +22,7 @@ var commands = {
         ],
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
-            message.channel.sendMessage("These are the servers I'm connected to:\n"+client.guilds.map((k,v)=>{return k}).join(",\n"));
+            message.channel.sendMessage("These are the servers I'm connected to:\n"+client.guilds.map((k)=>{return k}).join(",\n"));
             return true;
         },
         permissions: { global: true, restricted: true }
@@ -195,7 +195,7 @@ var commands = {
         ],
         description: "Gives some information about the bot.",
         process: function (client, message, usage) {
-            message.channel.sendMessage( "I am a coporduct of Dan and Harb.\n my GitHub: <https://github.com/DrJam/Jam>");
+            message.channel.sendMessage( "I am a coproduct of Dan and Harb.\n my GitHub: <https://github.com/DrJam/Jam>");
                 return true;
         },
         permissions: { global: true }
@@ -257,7 +257,10 @@ var commands = {
         description: "Assigns the mentioned user an assignable role. Use .listgiveroles for a list of assignable roles.",
         process: function (client, message, usage,dataHandlers) {
              if(message.mentions.users.array().length > 0)
+                {
                     target = message.mentions.users.first();
+                    target = message.guild.member(target);
+                }
                 else
                     return false;
             try{
@@ -282,7 +285,10 @@ var commands = {
         description: "Removes the assignable role from the mentioned user.",
         process: function(client, message, usage, dataHandlers){
             if(message.mentions.users.array().length > 0)
+                {
                     target = message.mentions.users.first();
+                    target = message.guild.member(target);
+                }
                 else
                     return false;
             try{

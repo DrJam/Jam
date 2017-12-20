@@ -46,10 +46,10 @@ roleManager.iam = function(message, role, data)
     if(role == undefined)
         return false;
     if(data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
-        message.author.addTo(role);
+        message.member.addRole(role, `Requested by this user.`);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            logChannel.sendMessage(,`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
+            logChannel.sendMessage(`Assigned ${role.name} to ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
         return true;
     }else
         return false;
@@ -62,16 +62,11 @@ roleManager.iamnot = function(message,role,data)
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
     if(data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
-        if(message.author.hasRole(role)){
-            message.author.removeFrom(role);
+            message.member.removeRole(role,"Removed per that user's request.");
             var logChannel = server.channels.find(function(x){return x.name=="logs"});
             if(logChannel!=undefined)
                 logChannel.sendMessage(`Removed ${role.name} from ${message.author.username}#${message.author.discriminator} per that user's request.`,{"disableEveryone":true});
             return {"value":true, "message":"Role succesfully removed!"};
-            
-        }else{
-            return {"value":false, "message":"You don't have that role."};
-        }
     }else
         return {"value":false, "message":"I have no role like that in the self assignable list."};
 }
@@ -83,10 +78,10 @@ roleManager.theyam = function(message, role, target, data)
     if(role == undefined)
         return false;
     if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
-       target.addTo(role);
+       target.addRole(role, `Assigned per ${message.author.username}#${message.author.discriminator}'s request.`).then(null,null);
         var logChannel = server.channels.find(function(x){return x.name=="logs"});
         if(logChannel!=undefined)
-            logChannel.sendMessage(`Assigned ${role.name} to ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
+            logChannel.sendMessage(`Assigned ${role.name} to ${target.user.username}#${target.user.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
         return true;
     }else
         return false;
@@ -99,16 +94,11 @@ roleManager.theyamnot = function(message,role,target,data)
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
     if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
-        if(target.hasRole(role)){
-            target.removeFrom(role);
-            var logChannel = server.channels.find(function(x){return x.name=="logs"});
-            if(logChannel!=undefined)
-                logChannel.sendMessage(`Removed ${role.name} from ${target.username}#${target.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
-            return {"value":true, "message":`Role succesfully removed from ${target.username}#${target.discriminator}!`};
-            
-        }else{
-            return {"value":false, "message":"That person doesn't have that role."};
-        }
+        target.removeRole(role);
+        var logChannel = server.channels.find(function(x){return x.name=="logs"});
+        if(logChannel!=undefined)
+            logChannel.sendMessage(`Removed ${role.name} from ${target.user.username}#${target.user.discriminator} per ${message.author.username}#${message.author.discriminator}'s request.`,{"disableEveryone":true});
+        return {"value":true, "message":`Role succesfully removed from ${target.user.username}#${target.user.discriminator}!`};
     }else
         return {"value":false, "message":"I have no role like that in the assignable list."};
 }

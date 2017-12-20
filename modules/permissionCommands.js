@@ -15,9 +15,9 @@ permissions.addRole = function(mod, message,command,role,data)
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         if(data[message.guild.id][command].blacklist)
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made ${role.name} role NO LONGER allowed to use ${command}.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} made ${role.name} role NO LONGER allowed to use ${command}.`,{"disableEveryone":true});
         else
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made all roles above and including ${role.name} now allowed to use ${command}.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} made all roles above and including ${role.name} now allowed to use ${command}.`,{"disableEveryone":true});
 
     return {"value": true, "message": "Role succesfully added."};
 
@@ -41,19 +41,20 @@ permissions.deleteRole =  function (mod, message, command, role, data)
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
         if(data[message.guild.id][command].blacklist)
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} made the ${role.name} role now allowed to use ${command} again.`,{"disableEveryone":true});
         else
-            message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`,{"disableEveryone":true});
+            logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} made the ${role.name} role no longer permitted to use ${command}.`,{"disableEveryone":true});
 
     return {"value": true, "message": "Role succesfully removed!"};
 }
 
 permissions.addUser =  function(mod, message,command,value,data)
 {
-    if(message.mentions.length==0)
+    if(message.mentions.users.array().length==0)
         return {"value": false}
     
-    var user = message.mentions[0];
+    var user = message.mentions.users.first();
+    user = message.guild.member(user);
 
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message": "That command does not exist, or does not allow permissions modifying!"};
@@ -71,16 +72,17 @@ permissions.addUser =  function(mod, message,command,value,data)
 
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} added explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} which were set to "${value}"`);
+        logChannel.sendMessage( `${message.author.username}#${message.author.discriminator} added explicit permissions on \`${command}\` for ${user.user.username}#${user.user.discriminator} which were set to "${value}"`,{"disableEveryone":true});
     return {"value": true, "message": output}; 
 }
 
 permissions.deleteUser = function(mod, message,command,data)
 {
-    if(message.mentions.length == 0)
+    if(message.mentions.users.array().length == 0)
         return {"value":false};
     
-    var user = message.mentions[0];
+        var user = message.mentions.users.first();
+        user = message.guild.member(user);
 
     if(mod.commands[command]==undefined || mod.commands[command].permissions.restricted != undefined)
         return {"value": true, "message": "That command does not exist, or does not allow permissions modifying!"};
@@ -90,7 +92,7 @@ permissions.deleteUser = function(mod, message,command,data)
     
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        logChannel.sendMessage(`${message.author.name}#${message.author.discriminator} removed explicit permissions on \`,{"disableEveryone":true}${command}\` for ${user.name}#${user.discriminator} `);
+        logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} removed explicit permissions on \`${command}\` for ${user.user.username}#${user.user.discriminator} `,{"disableEveryone":true});
 
     delete data[message.guild.id][command].users[user.id];
     return {"value": true, "message": "Associated permissions for this user are now forgotten."};
@@ -116,7 +118,7 @@ permissions.blacklist = function(mod, message, command, value, data)
 
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} switched ${command} to a ${listType}. All associated role permissions have been wiped.`,{"disableEveryone":true});
+        logChannel.sendMessage( `${message.author.username}#${message.author.discriminator} switched ${command} to a ${listType}. All associated role permissions have been wiped.`,{"disableEveryone":true});
 
     return {"value": true, "message": `Command succesfully switched to ${listType}. All associated roles have been wiped.`};
 }
@@ -151,7 +153,7 @@ permissions.addIgnoredRole = function(mod, message, role, data)
 
     var logChannel = server.channels.find(function(x){return x.name == "logs";});
     if(logChannel!= undefined)
-        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} added ${role.name} to the list of ignored roles for permissions.`,{"disableEveryone":true})
+        logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} added ${role.name} to the list of ignored roles for permissions.`,{"disableEveryone":true})
     
     return {"value": true , "message" : `${role.name}  was added to the list of ignored roles for permissions checking.`};
 }
@@ -172,7 +174,7 @@ permissions.removeIgnoredRole = function(mod,message, role, data){
 
     var logChannel = server.channels.find(function(x){return x.name == "logs";});
     if(logChannel!= undefined)
-        message.client.sendMessage(logChannel,`${message.author.name}#${message.author.discriminator} removed ${role.name} from the list of ignored roles for permissions.`,{"disableEveryone":true})
+        logChannel.sendMessage(`${message.author.username}#${message.author.discriminator} removed ${role.name} from the list of ignored roles for permissions.`,{"disableEveryone":true})
     
     return {"value": true , "message" : `${role.name}  was removed to the list of ignored roles for permissions checking.`};
 }
@@ -211,7 +213,7 @@ permissions.reset = function(mod, message, command, data)
     
     logChannel = message.guild.channels.find(function(x){return x.name=="logs"});
     if(logChannel!=undefined)
-        message.client.sendMessage(logChannel, `${message.author.name}#${message.author.discriminator} reset the permissions for ${command}`,{"disableEveryone":true});
+        logChannel.sendMessage( `${message.author.username}#${message.author.discriminator} reset the permissions for ${command}`,{"disableEveryone":true});
 
     return {"value": true, "message": `Permissions for "${command}" have been reset!`};
 }
@@ -237,10 +239,10 @@ permissions.list = function(mod, message, command, data)
         output+= "Users:";
         var output2 = "";
         for(var userId in perms.users){
-            if(message.guild.members.get("id",userId)!=null)
+            if(message.guild.members.get(userId)!=undefined)
             {
-                var userStuff = message.guild.members.get("id",userId)
-                output2+= `${userStuff.name}#${userStuff.discriminator}`;  
+                var userStuff = message.guild.members.get(userId)
+                output2+= `${userStuff.user.username}#${userStuff.user.discriminator}`;  
             }else{
                 output2+= userid;
             }

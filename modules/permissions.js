@@ -16,7 +16,7 @@ permissions.assertExistence = function(server)
 
 permissions.hasPermissions = function(mod,server,member, command){
     if(command.permissions.restricted)//restricted commands need botowner permissions.
-        return permissions.config.ownerids.find(function(x){return x==author.id})!=undefined;
+        return permissions.config.ownerids.find(function(x){return x==member.id})!=undefined;
     
     if(permissions.config.ownerids.find(function(x){return x==member.id})!=undefined || server.owner.id == member.id)
         return true;//bot and server owners are allowed everything according to Dan.

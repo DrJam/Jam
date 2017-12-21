@@ -113,7 +113,7 @@ client.on("message", function(message) {
         + message.author.username + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
-    if(permissions.hasPermissions(permissions, message.guild, message.author,commandObj)){
+    if(permissions.hasPermissions(permissions, message.guild, message.member,commandObj)){
         var usage = params.getParams(suffix, commandObj.usages);
         if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
             console.log("Incorrect usage");

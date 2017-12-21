@@ -14,28 +14,28 @@ permissions.assertExistence = function(server)
     }
 }
 
-permissions.hasPermissions = function(mod,server,author, command){
+permissions.hasPermissions = function(mod,server,member, command){
     if(command.permissions.restricted)//restricted commands need botowner permissions.
         return permissions.config.ownerids.find(function(x){return x==author.id})!=undefined;
     
-    if(permissions.config.ownerids.find(function(x){return x==author.id})!=undefined || server.owner.id == author.id)
+    if(permissions.config.ownerids.find(function(x){return x==member.id})!=undefined || server.owner.id == member.id)
         return true;//bot and server owners are allowed everything according to Dan.
 
     var perms = mod.data[server.id][command.name];
     var igRoles = mod.data[server.id]._ignoredRoles
-    if(perms.users[author.id] != undefined)
-        return perms.users[author.id];//personal permissions override everything.
+    if(perms.users[member.id] != undefined)
+        return perms.users[member.id];//personal permissions override everything.
 
     if(perms.blacklist){//on blacklist, thus if you have a role, you don't have permission
         for(var a = 0; a < perms.roles.length; a++){
             r = server.roles.find(function(x){return x.id == perms.roles[a]});
-            if(r != undefined && author.hasRole(r))
+            if(r != undefined && member.roles.get(r))
                 return false;
         }
         return true;
     }
     else{
-        var highestRole = 0;var authorRoles= server.rolesOfUser(author);
+        var highestRole = 0;var authorRoles= member.roles;
         for(var a = 0; a < authorRoles.length;a++){
             r = authorRoles[a];
             if(igRoles.find(function(x){return r.id == x}) == undefined && highestRole<r.position)

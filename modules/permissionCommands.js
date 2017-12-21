@@ -280,7 +280,7 @@ permissions.help = function(mod, message, data)
     }
 
     //No (server/bot) owner.
-    var authorRoles = message.guild.rolesOfUser(message.author);
+    var authorRoles = message.member.roles.array();
     var permLevel = 0;
     for(var r in authorRoles)//Get highest role.
     {

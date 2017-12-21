@@ -94,7 +94,7 @@ client.on("message", function(message) {
         return;
 
     if (message.content.toLowerCase() === "ayy") {
-        client.sendMessage(message.channel, "lmao");
+        message.channel.sendMessage("lmao");
         return;
     }
 

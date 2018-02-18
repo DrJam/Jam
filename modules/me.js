@@ -57,7 +57,7 @@ me.userInData = function(user,filehandler) {
 };
 
 me.getMe = function(user, data) {
-    var output = "__**" + user.name + "**#" + user.discriminator + "__\n";
+    var output = "__**" + user.username + "**#" + user.discriminator + "__\n";
     if (!data.hasOwnProperty(user.id) || Object.keys(data[user.id]).length == 0) {
         console.log("No data saved for this user");
         output += "No data saved for this user.";

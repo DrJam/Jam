@@ -21,6 +21,7 @@
 }
 
 function saveIntervalElapsed(){
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] FH: Saving data.`)
     for (var key in dataHandlers) {
         dataHandlers[key].save();
     }
@@ -34,7 +35,7 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
-var emoji = loadModule("./modules/emoji.js");
+//var emoji = loadModule("./modules/emoji.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
 
@@ -62,12 +63,12 @@ var clientConfig = { autoReconnect: true };
 var client = new Discord.Client(clientConfig);
 
 client.on("ready", function() {
-    console.log("Ready. Serving " + client.channels.length + " channels.");
+    console.log("Ready. Serving " + client.guilds.array().length + " serbers.");
     setInterval(saveIntervalElapsed, 1000 * 60 * config.saveInterval);
     if(config.status != undefined)
-        client.setPlayingGame(config.status);
+        client.user.setPresence({game:{name:config.status}}).then(null,null);
     else
-        client.setPlayingGame("config.status is undefined!");
+        client.user.setPresence({game:{name:"config.status is undefined!"}}).then(null,null);
     for(var i in events["ready"])
     {
         events["ready"][i][1](events["ready"][i][0],client);
@@ -75,7 +76,7 @@ client.on("ready", function() {
 });
 
 client.on("disconnected", function() {
-    console.log("Disconnected!");
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] Disconnected!`);
         for(var i in events["disconnected"])
     {
         events["disconnected"][i][1](events["disconnected"][i][0],client);
@@ -83,7 +84,7 @@ client.on("disconnected", function() {
 });
 
 client.on("message", function(message) {
-    if(message.server == undefined)//we do not handle private messages!
+    if(message.guild == undefined)//we do not handle private messages! (Yet)
         return;
     for(var i in events["message"])
     {
@@ -93,7 +94,7 @@ client.on("message", function(message) {
         return;
 
     if (message.content.toLowerCase() === "ayy") {
-        client.sendMessage(message.channel, "lmao");
+        message.channel.sendMessage("lmao");
         return;
     }
 
@@ -108,12 +109,11 @@ client.on("message", function(message) {
     if (!commands.hasOwnProperty(prefix)) 
         return;
 
-    console.log();
-    console.log(message.server.name + " | #" + message.channel.name + " | " 
-        + message.author.name + "#" + message.author.discriminator + ":" + message.content);
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] COMMAND: `+message.guild.name + " | #" + message.channel.name + " | " 
+        + message.author.username + "#" + message.author.discriminator + ":" + message.content);
         
     commandObj = commands[prefix];
-    if(permissions.hasPermissions(permissions, message.server, message.author,commandObj)){
+    if(permissions.hasPermissions(permissions, message.guild, message.member,commandObj)){
         var usage = params.getParams(suffix, commandObj.usages);
         if (!usage || !commandObj.process(client, message, usage, dataHandlers)) {
             console.log("Incorrect usage");
@@ -125,11 +125,11 @@ client.on("message", function(message) {
                 }
             }
             output += "```";
-            client.sendMessage(message.channel, output);
+            message.channel.sendMessage(output);
             return;
         }
     }else{//no permissions.
-        client.sendMessage(message.channel, "sorry, ur not cool enough for that command");
+        message.channel.sendMessage("sorry, ur not cool enough for that command");
     }
 });
 
@@ -140,7 +140,7 @@ client.on("serverNewMember", function (server, user) {
     }
 });
 
-client.on("presence", function (oldUser, newUser) {
+client.on("presenceUpdate", function (oldUser, newUser) {
     for(var i in events["presence"])
     {
         events["presence"][i][1](events["presence"][i][0],client,oldUser,newUser);
@@ -154,21 +154,20 @@ client.on("debug", function(message){
     {
         events["debug"][i][1](events["debug"][i][0],client,message);
     }
-    console.log(`[debug] ${message}`);
 });
 client.on("warn", function(message){
     for(var i in events["warn"])
     {
         events["warn"][i][1](events["warn"][i][0],client,message);
     }
-    console.log(`[warn] ${message}`);
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] WARN: ${message}`);
 });
 client.on("error", function(message){
     for(var i in events["error"])
     {
         events["error"][i][1](events["error"][i][0],client,message);
     }
-    console.log(`[error] ${message}`);
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] ERROR: ${message}`);
 });
 
 client.on("serverCreated", function(server) {
@@ -176,7 +175,7 @@ client.on("serverCreated", function(server) {
     {
         events["serverCreated"][i][1](events["serverCreated"][i][0],client,server);
     }
-    console.log(`[serverCreated] ${server.name}`);;
+    console.log(`[${new Date().toLocaleTimeString('en-GB',{hour12:false,timeZoneName:'short'})}] SERVER CREATED: ${server.name}`);;
 });
 
 client.on("serverDeleted", function(server) {
@@ -184,7 +183,6 @@ client.on("serverDeleted", function(server) {
     {
         events["warn"][i][1](events["warn"][i][0],client,server);
     }
-    console.log(`[warn] ${server.name}`);
 });
 
 client.on("messageDeleted",function (message, channel) {
@@ -294,4 +292,4 @@ client.on("userUnbanned",function(user,server){
 
 //end boring code
 
-client.loginWithToken(auth.token);
+client.login(auth.token);

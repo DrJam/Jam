@@ -28,9 +28,6 @@ fh.prototype.save = function() {
     if (this.dataLoaded) {
         var jsonString = JSON.stringify(this.data);
         fs.writeFileSync(this.fileName, jsonString);
-        console.log("FH: Saved \""+this.fileName+"\"");
-    } else {
-        console.log("FH:Data not loaded, not saving");
     }
     return;
 }

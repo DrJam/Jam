@@ -75,7 +75,11 @@ roleManager.theyam = function(message, role, target, data)
 {
     var server = message.guild;
     role = getFromName(server,role);
+    
     if(role == undefined)
+        return false;
+    target = server.member(target);
+    if(target == null || target == undefined)//Documentation isn't clear on what failure returns. I can only assume one of these two.
         return false;
     if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){
        target.addRole(role, `Assigned per ${message.author.username}#${message.author.discriminator}'s request.`).then(null,null);
@@ -91,6 +95,9 @@ roleManager.theyamnot = function(message,role,target,data)
 {
     var server = message.guild;
     role = getFromName(server,role);
+    target = server.member(target);
+    if(target == null || target == undefined)
+        return {"value":false,"message":"Not a member of this server."};
     if(role == undefined)
         return {"value":false, "message":"No role like that exist."};
     if(data[server.id].otherroles.find(function(x){return x==role.id})!=undefined || data[server.id].selfroles.find(function(x){return x==role.id})!=undefined){

@@ -94,7 +94,7 @@ client.on("message", function(message) {
         return;
 
     if (message.content.toLowerCase() === "ayy") {
-        message.channel.sendMessage("lmao");
+        message.channel.send("lmao");
         return;
     }
 
@@ -125,11 +125,11 @@ client.on("message", function(message) {
                 }
             }
             output += "```";
-            message.channel.sendMessage(output);
+            message.channel.send(output);
             return;
         }
     }else{//no permissions.
-        message.channel.sendMessage("sorry, ur not cool enough for that command");
+        message.channel.send("sorry, ur not cool enough for that command");
     }
 });
 

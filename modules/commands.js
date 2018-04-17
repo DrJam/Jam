@@ -22,7 +22,7 @@ var commands = {
         ],
         description: "Lists the servers the bot is connected to.",
         process: function (client, message, usage) {
-            message.channel.sendMessage("These are the servers I'm connected to:\n"+client.guilds.map((k)=>{return k}).join(",\n"));
+            message.channel.send("These are the servers I'm connected to:\n"+client.guilds.map((k)=>{return k}).join(",\n"));
             return true;
         },
         permissions: { global: true, restricted: true }
@@ -34,7 +34,7 @@ var commands = {
         ],
         description: "Shows the User ID of the sender",
         process: function (client, message, usage) {
-            message.channel.sendMessage( `This is your id: **${message.author.id}**`);
+            message.channel.send( `This is your id: **${message.author.id}**`);
             return true;
         },
         permissions: { global: true, restricted : true }
@@ -48,10 +48,10 @@ var commands = {
         process: function (client, message, usage) {
             if (usage.parameters.status.length > 0) {
                 client.user.setPresence({game:{name:usage.parameters.status}});
-                message.channel.sendMessage( "Playing status set to `" + usage.parameters.status + "`");
+                message.channel.send( "Playing status set to `" + usage.parameters.status + "`");
             } else {
                 client.user.setPresence({game:{name:""}});
-                message.channel.sendMessage( "Playing status cleared");
+                message.channel.send( "Playing status cleared");
             }
             return true;
         },
@@ -69,7 +69,7 @@ var commands = {
             ":small_blue_diamond: **With one argument**: Deletes a field in your information.\n"+
             ":small_blue_diamond: **With two arguments**: Adds or edits a field in your information. You can add spaces in the arguments by enclosing them with \"\". For example `.me Roles \"Mid > Carry > Pudge > rest\"`",
         process: function (client, message, usage, dataHandlers) {
-            message.channel.sendMessage( me.handle(message, usage, dataHandlers.me));
+            message.channel.send( me.handle(message, usage, dataHandlers.me));
             return true;
         },
         permissions: { global: true }
@@ -82,7 +82,7 @@ var commands = {
         description: "Finds the specified user's info.",
         process: function (client, message, usage, dataHandlers) {
             if(message.mentions.users.array().length>0){
-                message.channel.sendMessage( me.getMe(message.mentions.users.first(), dataHandlers.me.data));
+                message.channel.send( me.getMe(message.mentions.users.first(), dataHandlers.me.data));
                 return true;
             }
             return false;
@@ -98,7 +98,7 @@ var commands = {
         process: function (client, message, usage, DATA) {
             var data = DATA["games"].data["users"][message.author.id];
             if (data == undefined || Object.keys(data).length == 0) {
-                message.channel.sendMessage( "I have not seen you play any games.")
+                message.channel.send( "I have not seen you play any games.")
             } else {
                 var output = "I have seen you play the following game(s):```";
                 var copy = [];
@@ -139,7 +139,7 @@ var commands = {
                 } else {
                     output = "I have not seen you play any games long enough to be relevant.";
                 }
-                message.channel.sendMessage( output);
+                message.channel.send( output);
             }
             return true;
         },
@@ -183,7 +183,7 @@ var commands = {
                 }
                 
             }
-            message.channel.sendMessage( output);
+            message.channel.send( output);
             return true;
         },
         permissions: { global: true }
@@ -195,7 +195,7 @@ var commands = {
         ],
         description: "Gives some information about the bot.",
         process: function (client, message, usage) {
-            message.channel.sendMessage( "I am a coproduct of Dan and Harb.\n my GitHub: <https://github.com/DrJam/Jam>");
+            message.channel.send( "I am a coproduct of Dan and Harb.\n my GitHub: <https://github.com/DrJam/Jam>");
                 return true;
         },
         permissions: { global: true }
@@ -209,9 +209,9 @@ var commands = {
         process: function (client, message, usage) {
             if(message.mentions.users.array().length>0){
                 if(message.mentions.users.first().avatarURL!=null){
-                    message.channel.sendMessage(message.mentions.users.first().avatarURL);
+                    message.channel.send(message.mentions.users.first().avatarURL);
                 }else{
-                    message.channel.sendMessage("That user has no avatar set yet.");
+                    message.channel.send("That user has no avatar set yet.");
                 }
                 return true;
             }else{
@@ -229,9 +229,9 @@ var commands = {
         process: function (client, message, usage,dataHandlers) {
             var result = roleManager.iam(message,usage.parameters["role"],dataHandlers.roles.data);
             if(result)
-                message.channel.sendMessage(`Alright, you now have the "${usage.parameters["role"]}" role!`);
+                message.channel.send(`Alright, you now have the "${usage.parameters["role"]}" role!`);
             else
-                message.channel.sendMessage(`I couldn't find a role named liked that in my list of assignable roles. Use .listroles for a list of assignable roles.`);
+                message.channel.send(`I couldn't find a role named liked that in my list of assignable roles. Use .listroles for a list of assignable roles.`);
             return true;
         },
         permissions: { global: true }
@@ -244,7 +244,7 @@ var commands = {
         description: "Removes a self assignable role from you.",
         process: function(client, message, usage, dataHandlers){
             result = roleManager.iamnot(message,usage.parameters["role"], dataHandlers.roles.data)
-            message.channel.sendMessage( result.message)
+            message.channel.send( result.message)
             return true;
         },
         permissions: {global: true }
@@ -266,12 +266,12 @@ var commands = {
             try{
                 let result = roleManager.theyam(message,usage.parameters["role"],target,dataHandlers.roles.data);
                 if(result)
-                message.channel.sendMessage(`Alright, They now have the "${usage.parameters["role"]}" role!`);
+                message.channel.send(`Alright, They now have the "${usage.parameters["role"]}" role!`);
             else
-                message.channel.sendMessage(`I couldn't find a role named liked that in my list of assignable roles. Use .listgiveroles for a list of assignable roles.`);
+                message.channel.send(`I couldn't find a role named liked that in my list of assignable roles. Use .listgiveroles for a list of assignable roles.`);
             }
             catch(e){
-                message.channel.sendMessage("Something went wrong!");
+                message.channel.send("Something went wrong!");
             }
             return true;
         },
@@ -293,9 +293,9 @@ var commands = {
                     return false;
             try{
                 result = roleManager.theyamnot(message,usage.parameters["role"],target, dataHandlers.roles.data)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             }catch(e){
-                message.channel.sendMessage( "Something went wrong!");
+                message.channel.send( "Something went wrong!");
             }
             return true;
         },
@@ -308,7 +308,7 @@ var commands = {
         ],
         description: "Returns the list of self assignable roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.lsar(message,dataHandlers.roles.data));
+            message.channel.send(roleManager.lsar(message,dataHandlers.roles.data));
             return true;
         },
         permissions: { global: true }
@@ -320,7 +320,7 @@ var commands = {
         ],
         description: "Adds a role to the list of self assignable roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.asar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.asar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -332,7 +332,7 @@ var commands = {
         ],
         description: "Removes a role to the list of self assignable roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.dsar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.dsar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -344,7 +344,7 @@ var commands = {
         ],
         description: "Returns the list of assignable roles (with .giverole).",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.loar(message,dataHandlers.roles.data));
+            message.channel.send(roleManager.loar(message,dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -356,7 +356,7 @@ var commands = {
         ],
         description: "Adds a role to the list of mod assignable roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.aoar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.aoar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -368,7 +368,7 @@ var commands = {
         ],
         description: "Removes a role to the list of assignable roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.doar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.doar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -381,7 +381,7 @@ var commands = {
         description: "Lists all automatically assigned roles.",
         process: function(client, message, usage, dataHandlers)
         {
-            message.channel.sendMessage(roleManager.laar(message,dataHandlers.roles.data));
+            message.channel.send(roleManager.laar(message,dataHandlers.roles.data));
             return true;
         },
         permissions: {global: false}
@@ -393,7 +393,7 @@ var commands = {
         ],
         description: "Adds a role to the list of auto assigned roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.aaar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.aaar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -405,7 +405,7 @@ var commands = {
         ],
         description: "Removes a role to the list of auto assigned roles.",
         process: function (client, message, usage,dataHandlers) {
-            message.channel.sendMessage(roleManager.daar(message,usage.parameters["role"], dataHandlers.roles.data));
+            message.channel.send(roleManager.daar(message,usage.parameters["role"], dataHandlers.roles.data));
             return true;
         },
         permissions: { global: false }
@@ -424,7 +424,7 @@ var commands = {
             else
                 result = permissions.blacklist(permissions, message, usage.parameters.command, usage.parameters["true/false"], dataHandlers.permissions.data)
             if(result.value)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             return result.value
         },
         permissions: { global: false }
@@ -448,7 +448,7 @@ var commands = {
                 default: result = {"value": false}; break;
             }
             if(result.value)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             return result.value;
         },
         permissions: { global: false }
@@ -472,7 +472,7 @@ var commands = {
                     break;
             }
             if(result.value)
-                message.channel.sendMessage( result.message,{disableEveryone : true});
+                message.channel.send( result.message,{disableEveryone : true});
             return result.value;
         },
         permissions: { global: false }
@@ -502,7 +502,7 @@ var commands = {
                 }
             }
             if(result.value)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             return result.value;
         },
         permissions: {global: false}
@@ -517,7 +517,7 @@ var commands = {
         process: function (client, message, usage, dataHandlers) {
             var result = permissions.reset(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
             if(result.value)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             return result.value;
         },
         permissions: { global: false }
@@ -531,7 +531,7 @@ var commands = {
         process: function (client, message, usage, dataHandlers) {
             var result = permissions.list(permissions,message, usage.parameters.command, dataHandlers.permissions.data)
             if(result.value)
-                message.channel.sendMessage( result.message);
+                message.channel.send( result.message);
             return result.value;
         },
         permissions: { global: false }
@@ -548,9 +548,9 @@ var commands = {
             try{eval(usage.parameters.expression);}
             catch(E){print(`Following error was encountered: ${E.message}`);}
             if(_output.length>0)
-                message.channel.sendMessage(_output.join("\n"));
+                message.channel.send(_output.join("\n"));
             else
-                message.channel.sendMessage( "No output.");
+                message.channel.send( "No output.");
             return true;
         },
         permissions: {global: false, restricted: true}

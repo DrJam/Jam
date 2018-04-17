@@ -22,21 +22,26 @@ function getParamsArray (suffix) {
 	return paramsArray;
 }
 
-function mapParams (params, usages) {
-	var mapping = {};
-	for (var i = 0; i < usages.length; i++) {
-		if (usages[i].length != params.length) 
+var mapParams = function  (params, usages) {
+	let result = {};
+	let bestMatch  = params.length+1;
+	for (let i = 0; i < usages.length; i++) {
+		if (Math.abs(params.length - usages[i].length) > bestMatch || usages[i].length > params.length) 
 			continue;
-
-		for (var j = 0; j < usages[i].length; j++) {
+		let mapping = {};
+		bestMatch = Math.abs(params.length - usages[i].length);
+		for (let j = 0; j < usages[i].length; j++) {
 			mapping[usages[i][j]] = params[j]; 
         }
-        var result = {};
+		for(let j = usages[i].length;j < params.length; j++)
+			mapping[usages[i][usages[i].length-1]] += " "+params[j];
+        result = {};
         result.usageid = i;
 	    result.parameters = mapping;
-	    return result;
 	}
-	return null;
+    if(result == {})
+	    return null;
+    return result;
 }
 
 module.exports = param;

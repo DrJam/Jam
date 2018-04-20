@@ -86,10 +86,15 @@ client.on("disconnected", function() {
 client.on("message", function(message) {
     if(message.guild == undefined)//we do not handle private messages! (Yet)
         return;
+    
+    let handled = false;
     for(var i in events["message"])
     {
-        events["message"][i][1](events["message"][i][0],client,message);
+        handled |= events["message"][i][1](events["message"][i][0],client,message);
     }
+    if(handled)
+        return;
+        
     if (message.author == client.user || message.author.bot)
         return;
 

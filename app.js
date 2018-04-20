@@ -35,6 +35,8 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
+var lmao = loadModule("./modules/ayyLmao.js");
+//var shuntingYard = loadModule("./modules/shuntingyard.js");
 //var emoji = loadModule("./modules/emoji.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
@@ -94,14 +96,9 @@ client.on("message", function(message) {
     }
     if(handled)
         return;
-        
+
     if (message.author == client.user || message.author.bot)
         return;
-
-    if (message.content.toLowerCase() === "ayy") {
-        message.channel.send("lmao");
-        return;
-    }
 
     if (!message.content.startsWith(config.prefix))
         return;

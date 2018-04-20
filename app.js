@@ -90,9 +90,9 @@ client.on("message", function(message) {
         return;
     
     let handled = false;
-    for(var i in events["message"])
+    for(var i in events["rawMessage"])
     {
-        handled |= events["message"][i][1](events["message"][i][0],client,message);
+        handled |= events["rawMessage"][i][1](events["rawMessage"][i][0],client,message);
     }
     if(handled)
         return;
@@ -102,6 +102,14 @@ client.on("message", function(message) {
 
     if (!message.content.startsWith(config.prefix))
         return;
+
+    handled = false;
+    for(var i in events["message"])
+    {
+        handled |= events["message"][i][1](events["message"][i][0],client,message);
+    }
+    if(handled)
+        return;    
 
     var contentArray = message.content.split(" ");
     var prefix = contentArray.splice(0, 1)[0];

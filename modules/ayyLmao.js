@@ -8,7 +8,7 @@ ayyLmao.ayy =  function(mod, client, message){
     return false;
 }
 
-shuntingYard.events = {
+ayyLmao.events = {
     "message": ayyLmao.ayy
 };
 

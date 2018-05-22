@@ -36,8 +36,6 @@ var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
 var game = loadModule("./modules/games.js");
 var lmao = loadModule("./modules/ayyLmao.js");
-//var shuntingYard = loadModule("./modules/shuntingyard.js");
-//var emoji = loadModule("./modules/emoji.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
 

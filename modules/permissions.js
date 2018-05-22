@@ -31,7 +31,7 @@ permissions.hasPermissions = function(mod,server,member, command){
         return !authorRoles.some((v,i,a)=>{return perms.roles.includes(v.id)})
     }
     else{//whitelisted
-        let trueRoles = authorRoles.map((v,i,a) => {return !igRoles.includes(v.id)});
+        let trueRoles = authorRoles.filter((v,i,a) => {return !igRoles.includes(v.id)});
         return trueRoles.some((v,i,a)=>{return perms.roles.includes(v.id)})
     }
 }

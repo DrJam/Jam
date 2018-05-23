@@ -34,7 +34,6 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
-var game = loadModule("./modules/games.js");
 var lmao = loadModule("./modules/ayyLmao.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
@@ -48,7 +47,6 @@ permissions.config = config; //neater solution needed
 
 var dataHandlers = { 
     me: new FileHandler("./data/data.json"), 
-    games: new FileHandler("./data/games.json"),
     roles: new FileHandler("./data/roles.json"),
     permissions : new FileHandler("./data/permissions.json") 
 };
@@ -153,7 +151,6 @@ client.on("presenceUpdate", function (oldUser, newUser) {
     {
         events["presence"][i][1](events["presence"][i][0],client,oldUser,newUser);
     }
-    game.Update(oldUser,dataHandlers["games"].data);
 });
 
 //start boring code

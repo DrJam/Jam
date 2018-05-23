@@ -89,62 +89,6 @@ var commands = {
         },
         permissions: { global: true }
     },
-    "played": {
-		name: "played",
-        usages: [
-            []
-        ],
-        description: "Replies with which games the user has played for how long.",
-        process: function (client, message, usage, DATA) {
-            var data = DATA["games"].data["users"][message.author.id];
-            if (data == undefined || Object.keys(data).length == 0) {
-                message.channel.send( "I have not seen you play any games.")
-            } else {
-                var output = "I have seen you play the following game(s):```";
-                var copy = [];
-                for (var key in data) {
-                    if (data[key] > 60000) {
-                        copy.push({ name: key, time: data[key] })
-                    }
-                }
-                if (copy.length != 0) {
-                    copy.sort(function (x, y) { return y.time - x.time; });
-                    for (var a = 0; a < copy.length && a < 10; a++) {
-                        output += "\n" + copy[a].name + " :";
-                        var msec = copy[a].time;
-                        var days = Math.floor(msec / 1000 / 60 / 60 / 24);
-                        msec -= days * 1000 * 60 * 60 * 24;
-                        var hours = Math.floor(msec / 1000 / 60 / 60);
-                        msec -= hours * 1000 * 60 * 60;
-                        var mins = Math.floor(msec / 1000 / 60);
-                        if (days > 1) 
-                            output += " " + days + " days";
-                        if(days == 1)
-                            output += " 1 day";
-                        if(mins>0 && hours>0 && days>0)
-                            output += ",";
-                        if (hours > 1)
-                            output += " " + hours + " hours";
-                        if(hours == 1)
-                            output += " 1 hour";
-                        if(days+hours > 0 && mins>0)
-                            output += " and"
-                        if (mins > 1)
-                            output += " " + mins + " minutes";
-                        if(mins == 1)
-                            output += " 1 minute";
-                        output += "."
-                    }
-                    output += "```";
-                } else {
-                    output = "I have not seen you play any games long enough to be relevant.";
-                }
-                message.channel.send( output);
-            }
-            return true;
-        },
-        permissions: { global: true }
-    },
     "help": {
 		name: "help",
         usages: [

@@ -23,30 +23,16 @@ permissions.hasPermissions = function(mod,server,member, command){
 
     var perms = mod.data[server.id][command.name];
     var igRoles = mod.data[server.id]._ignoredRoles
+    var authorRoles= member.roles;
     if(perms.users[member.id] != undefined)
         return perms.users[member.id];//personal permissions override everything.
 
     if(perms.blacklist){//on blacklist, thus if you have a role, you don't have permission
-        for(var a = 0; a < perms.roles.length; a++){
-            r = server.roles.find(function(x){return x.id == perms.roles[a]});
-            if(r != undefined && member.roles.get(r))
-                return false;
-        }
-        return true;
+        return !authorRoles.some((v,i,a)=>{return perms.roles.includes(v.id)})
     }
-    else{
-        var highestRole = 0;var authorRoles= member.roles;
-        for(var a = 0; a < authorRoles.length;a++){
-            r = authorRoles[a];
-            if(igRoles.find(function(x){return r.id == x}) == undefined && highestRole<r.position)
-                highestRole = r.position;
-        }
-        for(var a = 0; a < perms.roles.length;a++){
-            r = server.roles.find(function(x){return x.id == perms.roles[a]});
-            if(r!= undefined && highestRole>=r.position)
-                return true;
-        }
-        return false;
+    else{//whitelisted
+        let trueRoles = authorRoles.filter((v,i,a) => {return !igRoles.includes(v.id)});
+        return trueRoles.some((v,i,a)=>{return perms.roles.includes(v.id)})
     }
 }
 

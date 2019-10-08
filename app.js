@@ -34,8 +34,7 @@ var FileHandler = loadModule("./modules/fileHandler.js");
 
 var commands = loadModule("./modules/commands.js");
 var params = loadModule("./modules/params.js");
-var game = loadModule("./modules/games.js");
-//var emoji = loadModule("./modules/emoji.js");
+var lmao = loadModule("./modules/ayyLmao.js");
 var roleManager =  loadModule("./modules/rolemanager.js");
 var permissions = loadModule("./modules/permissions.js");
 
@@ -48,7 +47,6 @@ permissions.config = config; //neater solution needed
 
 var dataHandlers = { 
     me: new FileHandler("./data/data.json"), 
-    games: new FileHandler("./data/games.json"),
     roles: new FileHandler("./data/roles.json"),
     permissions : new FileHandler("./data/permissions.json") 
 };
@@ -86,20 +84,28 @@ client.on("disconnected", function() {
 client.on("message", function(message) {
     if(message.guild == undefined)//we do not handle private messages! (Yet)
         return;
-    for(var i in events["message"])
+    
+    let handled = false;
+    for(var i in events["rawMessage"])
     {
-        events["message"][i][1](events["message"][i][0],client,message);
+        handled |= events["rawMessage"][i][1](events["rawMessage"][i][0],client,message);
     }
+    if(handled)
+        return;
+
     if (message.author == client.user || message.author.bot)
         return;
 
-    if (message.content.toLowerCase() === "ayy") {
-        message.channel.send("lmao");
-        return;
-    }
-
     if (!message.content.startsWith(config.prefix))
         return;
+
+    handled = false;
+    for(var i in events["message"])
+    {
+        handled |= events["message"][i][1](events["message"][i][0],client,message);
+    }
+    if(handled)
+        return;    
 
     var contentArray = message.content.split(" ");
     var prefix = contentArray.splice(0, 1)[0];
@@ -145,7 +151,6 @@ client.on("presenceUpdate", function (oldUser, newUser) {
     {
         events["presence"][i][1](events["presence"][i][0],client,oldUser,newUser);
     }
-    game.Update(oldUser,dataHandlers["games"].data);
 });
 
 //start boring code

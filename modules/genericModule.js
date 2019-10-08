@@ -3,6 +3,7 @@ var moduleName = {};
 moduleName.events = {
     "ready": function (mod,client) {},
     "debug": function (mod,client, message) {},
+    "rawMessage": function (mod,client, message) {},
     "message": function (mod,client, message) {},
     "warn": function (mod,client, message) {},
     "messageDeleted": function (mod,client, message, channel) {},

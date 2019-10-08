@@ -23,24 +23,28 @@ function getParamsArray (suffix) {
 }
 
 var mapParams = function  (params, usages) {
-	let result = {};
+	let result = false;
 	let bestMatch  = params.length+1;
-	for (let i = 0; i < usages.length; i++) {
-		if (Math.abs(params.length - usages[i].length) > bestMatch || usages[i].length > params.length) 
+	for (let i in usages) {
+		difference = params.length - usages[i].length;
+		if (difference > bestMatch || difference < 0) {
 			continue;
+		}
+
 		let mapping = {};
-		bestMatch = Math.abs(params.length - usages[i].length);
-		for (let j = 0; j < usages[i].length; j++) {
+		
+		for (let j in usages[i]){
 			mapping[usages[i][j]] = params[j]; 
-        }
-		for(let j = usages[i].length;j < params.length; j++)
+		}
+		for(let j = usages[i].length;j < params.length; j++){
 			mapping[usages[i][usages[i].length-1]] += " "+params[j];
+		}
+
+		bestMatch = difference;
         result = {};
         result.usageid = i;
 	    result.parameters = mapping;
 	}
-    if(result == {})
-	    return null;
     return result;
 }
 
